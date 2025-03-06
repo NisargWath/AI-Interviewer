@@ -1,5 +1,5 @@
 /* Modern Authentication Styling */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 :root {
   --primary-color: #2a9d8f;
@@ -21,7 +21,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
@@ -140,6 +140,13 @@ body {
 .input-group input:focus {
   outline: none;
   border-color: var(--primary-color);
+}
+
+.signup-boy-edit {
+  width: 23rem;
+  height: auto;
+  border-radius: 3rem;
+  border: 4px solid white;
 }
 
 /* Animation for input fields */
@@ -282,7 +289,7 @@ body {
 }
 
 .login-right::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
@@ -336,9 +343,15 @@ body {
 
 /* Input field animations */
 @keyframes focusAnimation {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .input-group input:focus {
@@ -347,9 +360,15 @@ body {
 
 /* Button animations */
 @keyframes buttonPulse {
-  0% { box-shadow: 0 0 0 0 rgba(42, 157, 143, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(42, 157, 143, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(42, 157, 143, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(42, 157, 143, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(42, 157, 143, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(42, 157, 143, 0);
+  }
 }
 
 .auth-button:hover {
@@ -363,37 +382,39 @@ body {
     flex-direction: column;
     max-width: 600px;
   }
-  
-  .left-panel, .right-panel,
-  .login-left, .login-right {
+
+  .left-panel,
+  .right-panel,
+  .login-left,
+  .login-right {
     width: 100%;
   }
-  
+
   .left-panel {
     padding: 30px;
     min-height: 200px;
   }
-  
+
   .tagline {
     margin-top: 0;
   }
-  
+
   .tagline h1 {
     font-size: 1.8rem;
   }
-  
+
   .illustration-placeholder {
     display: none;
   }
-  
+
   .login-container {
     flex-direction: column;
   }
-  
+
   .login-right {
     min-height: 150px;
   }
-  
+
   .login-right::after {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
@@ -404,33 +425,34 @@ body {
     box-shadow: none;
     background: transparent;
   }
-  
-  .right-panel, .login-left {
+
+  .right-panel,
+  .login-left {
     background-color: var(--white);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 30px 20px;
   }
-  
+
   .name-fields {
     flex-direction: column;
     gap: 0;
   }
-  
+
   .form-title {
     font-size: 1.5rem;
     margin-bottom: 20px;
   }
-  
+
   .login-header h1 {
     font-size: 1.8rem;
   }
-  
+
   .left-panel {
     border-radius: var(--border-radius);
     margin-bottom: 20px;
   }
-  
+
   .login-right {
     border-radius: var(--border-radius);
     margin-bottom: 20px;
@@ -444,7 +466,7 @@ body {
 }
 
 .input-group input::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 2px;
@@ -465,17 +487,27 @@ body {
 }
 
 /* Smooth hover transitions */
-.auth-button, .forgot-password, .link, .google-button {
+.auth-button,
+.forgot-password,
+.link,
+.google-button {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Placeholder for loading animation */
 @keyframes loadIn {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.form-container, .login-header {
+.form-container,
+.login-header {
   animation: loadIn 0.6s ease-out forwards;
 }
 
@@ -484,10 +516,18 @@ body {
   animation: loadIn 0.6s ease-out forwards;
 }
 
-.input-group:nth-child(1) { animation-delay: 0.1s; }
-.input-group:nth-child(2) { animation-delay: 0.2s; }
-.input-group:nth-child(3) { animation-delay: 0.3s; }
-.input-group:nth-child(4) { animation-delay: 0.4s; }
+.input-group:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.input-group:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.input-group:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.input-group:nth-child(4) {
+  animation-delay: 0.4s;
+}
 
 .auth-button {
   opacity: 0;
