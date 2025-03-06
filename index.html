@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Powered Interviewer</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <a href="#" class="logo">
+          <span class="logo-icon">⏳</span>
+          IntervoAI
+        </a>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#">Explore</a></li>
+            <li><a href="#">Resources</a></li>
+            <li><a href="#">Teams</a></li>
+            <li><a href="#">Pricing</a></li>
+          </ul>
+          <div class="auth-buttons">
+            <a href="./login.html" class="login-btn">Log in</a>
+            <a href="./signup.html" class="signup-btn">
+              <span>Sign Up</span>
+              →
+            </a>
+          </div>
+          <button class="mobile-menu-btn">☰</button>
+        </nav>
+      </header>
+
+      <!-- Mobile Menu (hidden by default) -->
+      <div class="mobile-menu">
+        <button class="mobile-menu-close">✕</button>
+        <ul class="mobile-nav-links">
+          <li><a href="#">Explore</a></li>
+          <li><a href="#">Resources</a></li>
+          <li><a href="#">Teams</a></li>
+          <li><a href="#">Pricing</a></li>
+        </ul>
+        <div class="mobile-auth-buttons">
+          <a href="#" class="mobile-login-btn">Log in</a>
+          <a href="#" class="mobile-signup-btn">Sign Up</a>
+        </div>
+      </div>
+
+      <!-- Hero Section -->
+      <section class="hero">
+        <h1 class="hero-title">
+          Interview prep? <br />
+          🤖 AI got your back !<br />
+          <div class="highlight-box">Bestie 🤝</div>
+        </h1>
+        <p class="hero-description">
+          Get ready to ace your interviews with real-time AI-driven mock
+          sessions, instant feedback, and smart analysis. Practice, improve, and
+          land your dream job! 🚀💼
+        </p>
+        <a href="#" class="cta-button">
+          Get started free
+          <span>→</span>
+        </a>
+      </section>
+
+      <!-- Plans Section -->
+      <section class="plans">
+        <h2 class="plans-title">A plan to fit your needs companies...</h2>
+        <div class="plan-cards">
+          <div class="plan-card">
+            <span class="plan-icon">📦</span>
+            <h3 class="plan-name">Free Forever</h3>
+            <p class="plan-description">
+              Link your web apps with clicks, so they become can share data
+            </p>
+          </div>
+          <div class="plan-card">
+            <span class="plan-icon">🧰</span>
+            <h3 class="plan-name">Professional</h3>
+            <p class="plan-description">
+              Pass info between your apps workflows called Fozra automative
+            </p>
+          </div>
+          <div class="plan-card">
+            <span class="plan-icon">🏢</span>
+            <h3 class="plan-name">Companies</h3>
+            <p class="plan-description">
+              Build processes faster and get done no code required automative
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Autolip. All rights reserved.</p>
+      </div>
+    </footer>
+    <script>
+      // Mobile menu functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
+        const mobileMenuClose = document.querySelector(".mobile-menu-close");
+        const mobileMenu = document.querySelector(".mobile-menu");
+
+        mobileMenuBtn.addEventListener("click", function () {
+          mobileMenu.classList.add("active");
+        });
+
+        mobileMenuClose.addEventListener("click", function () {
+          mobileMenu.classList.remove("active");
+        });
+      });
+    </script>
+  </body>
+</html>
