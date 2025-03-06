@@ -17,7 +17,6 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
-
     <style>
       /* static/css/style.css */
       body {
@@ -47,9 +46,30 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
+      .response-video {
+        width: 100%;
+        max-width: 480px;
+        height: auto;
+        border-radius: 8px;
+        background-color: #000;
+        margin: 0 auto;
+        display: block;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
       .video-container {
         position: relative;
         padding: 1rem;
+      }
+
+      .transcript-box {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 4px solid #007bff;
+        max-height: 200px;
+        overflow-y: auto;
       }
 
       .timer-display {
@@ -109,6 +129,14 @@
         margin-bottom: 1rem;
       }
 
+      .strengths-feedback {
+        border-left: 4px solid #28a745;
+      }
+
+      .improvement-feedback {
+        border-left: 4px solid #ffc107;
+      }
+
       .overall-score {
         padding: 2rem 0;
       }
@@ -159,15 +187,26 @@
         font-weight: bold;
       }
 
+      .video-review-container,
+      .transcript-container {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+      }
+
+      .video-review-container h5,
+      .transcript-container h5 {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+
       @media (max-width: 768px) {
         .timer-display {
           top: 1rem;
           right: 1rem;
           font-size: 1rem;
-        }
-
-        .feedback-container {
-          flex-direction: column;
         }
       }
     </style>
@@ -262,6 +301,26 @@
                     data-bs-parent="#questionAnalysis"
                   >
                     <div class="accordion-body">
+                      {% if individual_analyses[i].video_path %}
+                      <div class="video-review-container mb-4">
+                        <h5>Video Response</h5>
+                        <video class="response-video" controls>
+                          <source
+                            src="{{ url_for('static', filename=individual_analyses[i].video_path) }}"
+                            type="video/webm"
+                          />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                      {% endif %} {% if individual_analyses[i].transcript %}
+                      <div class="transcript-container mb-4">
+                        <h5>Response Transcript</h5>
+                        <div class="transcript-box">
+                          <p>{{ individual_analyses[i].transcript }}</p>
+                        </div>
+                      </div>
+                      {% endif %}
+
                       <div class="row">
                         <div class="col-md-6">
                           <h5>Performance Indicators</h5>
