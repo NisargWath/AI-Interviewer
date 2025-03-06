@@ -1,3 +1,4 @@
+/* Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -240,6 +241,14 @@ nav {
   border: 1px solid #dee2e6;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   font-size: 16px;
+  /* Added hover transition for CTA button */
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  /* Added hover effect for CTA button */
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .cta-button span {
@@ -259,19 +268,65 @@ nav {
 
 .plan-cards {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Changed from space-between to better center the 4 cards */
+  flex-wrap: wrap; /* Added to ensure cards wrap on smaller screens */
   margin-top: 40px;
+  gap: 20px; /* Added gap for consistent spacing between cards */
 }
 
+/* Enhanced plan card with shadows and animations */
 .plan-card {
   flex: 1;
-  max-width: 300px;
-  padding: 20px;
-  margin: 0 15px;
+  min-width: 250px; /* Added minimum width */
+  max-width: 280px; /* Adjusted maximum width to fit 4 cards */
+  padding: 25px; /* Increased padding slightly */
+  margin: 0 10px;
   text-align: center;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  /* Enhanced shadow for cards */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  /* Added transition for hover effect */
+  transition: all 0.3s ease;
+  /* Added animation */
+  animation: fadeIn 0.8s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animation keyframes for initial load */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation delay for staggered appearance */
+.plan-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.plan-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.plan-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.plan-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+/* Hover effect for plan cards */
+.plan-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .plan-icon {
@@ -291,17 +346,25 @@ nav {
   font-size: 14px;
   color: #6c757d;
   margin: 0 auto;
+  line-height: 1.6; /* Improved line height for better readability */
+}
+
+/* Added styling for emphasized text */
+.plan-description em {
+  font-style: italic;
+  color: #007bff; /* Blue color for highlighted terms */
+  font-weight: 500;
 }
 
 /* Media queries for responsiveness */
 @media (max-width: 992px) {
   .plan-cards {
-    flex-direction: column;
-    align-items: center;
+    flex-wrap: wrap; /* Ensure items wrap on tablet */
+    justify-content: center;
   }
 
   .plan-card {
-    max-width: 100%;
+    flex: 0 0 calc(50% - 30px); /* Two cards per row on tablets */
     margin-bottom: 20px;
   }
 
@@ -336,6 +399,12 @@ nav {
     font-size: 26px;
     padding: 8px 20px;
   }
+  
+  .plan-card {
+    flex: 0 0 calc(100% - 30px); /* Full width cards on mobile */
+    max-width: 100%;
+  }
+  
   footer {
     padding: 20px 0;
   }
@@ -356,6 +425,7 @@ nav {
     height: 30px;
     font-size: 12px;
   }
+  
   .footer-bottom {
     font-size: 12px;
   }
@@ -378,14 +448,3 @@ footer {
   color: #6c757d;
   font-size: 14px;
 }
-
-
-
-
-
-
-
-
-
-
-
