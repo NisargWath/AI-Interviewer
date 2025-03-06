@@ -45,6 +45,10 @@ QUESTION_BANK = [
 def index():
     return render_template('index.html')
 
+@app.route("/phase1")
+def phase1():
+    return render_template("phase1.html")
+
 @app.route('/start-interview', methods=['POST'])
 def start_interview():
     # Create a unique interview session
