@@ -20,10 +20,17 @@
             <li><a href="#">Resources</a></li>
             <li><a href="#">Teams</a></li>
             <li><a href="#">Pricing</a></li>
+            <!-- <li class="dropdown">
+              <a href="#" class="dropdown-toggle">I am a <span class="dropdown-arrow">▼</span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" class="user-type" data-type="jobseeker">Job Seeker</a></li>
+                <li><a href="#" class="user-type" data-type="recruiter">Recruiter</a></li>
+              </ul>
+            </li> -->
           </ul>
           <div class="auth-buttons">
-            <a href="/login" class="login-btn">Log in</a>
-            <a href="/signup" class="signup-btn">
+            <a href="/login" class="login-btn" id="login-btn">Log in</a>
+            <a href="/signup" class="signup-btn" id="signup-btn">
               <span>Sign Up</span>
               →
             </a>
@@ -40,19 +47,31 @@
           <li><a href="#">Resources</a></li>
           <li><a href="#">Teams</a></li>
           <li><a href="#">Pricing</a></li>
+          <li class="mobile-dropdown">
+            <a href="#" class="mobile-dropdown-toggle">I am a <span class="dropdown-arrow">▼</span></a>
+            <ul class="mobile-dropdown-menu">
+              <li><a href="#" class="user-type" data-type="jobseeker">Job Seeker</a></li>
+              <li><a href="#" class="user-type" data-type="recruiter">Recruiter</a></li>
+            </ul>
+          </li>
         </ul>
         <div class="mobile-auth-buttons">
-          <a href="#" class="mobile-login-btn">Log in</a>
-          <a href="#" class="mobile-signup-btn">Sign Up</a>
+          <a href="#" class="mobile-login-btn" id="mobile-login-btn">Log in</a>
+          <a href="#" class="mobile-signup-btn" id="mobile-signup-btn">Sign Up</a>
         </div>
       </div>
 
       <!-- Hero Section -->
       <section class="hero">
         <h1 class="hero-title">
-          Interview prep? <br />
-          🤖 AI got your back !<br />
-          <div class="highlight-box">Bestie 🤝</div>
+          <!-- Your Next Great Hire, Interviewed & Analyzed Instantly -->
+          Your Next Great Hire, <br />
+          Interviewed & Analyzed Instantly !<br />
+          <!-- <div class="highlight-box">Bestie 🤝</div> -->
+          <div class="auth-buttons">
+            <a href="/jobseeker-register" class="login-btn highlight-box" id="login-btn">Sign up as Candidate → </a>
+            <a href="/jobrecruiter-register" class="signup-btn highlight-box" id="signup-btn">Sign up as Business → </a>
+          </div>
         </h1>
         <p class="hero-description">
           Get ready to ace your interviews with real-time AI-driven mock
@@ -107,7 +126,7 @@
 
     <footer>
       <div class="footer-bottom">
-        <p>&copy; 2025 Autolip. All rights reserved.</p>
+        <p>&copy; 2025 IntervoAI. All rights reserved.</p>
       </div>
     </footer>
     <script>
@@ -116,7 +135,18 @@
         const mobileMenuBtn = document.querySelector(".mobile-menu-btn");
         const mobileMenuClose = document.querySelector(".mobile-menu-close");
         const mobileMenu = document.querySelector(".mobile-menu");
+        const userTypeLinks = document.querySelectorAll(".user-type");
+        const loginBtn = document.getElementById("login-btn");
+        const signupBtn = document.getElementById("signup-btn");
+        const mobileLoginBtn = document.getElementById("mobile-login-btn");
+        const mobileSignupBtn = document.getElementById("mobile-signup-btn");
+        const dropdownToggle = document.querySelector(".dropdown-toggle");
+        const mobileDropdownToggle = document.querySelector(".mobile-dropdown-toggle");
+        
+        // Default user type
+        let currentUserType = "jobseeker";
 
+        // Toggle mobile menu
         mobileMenuBtn.addEventListener("click", function () {
           mobileMenu.classList.add("active");
         });
@@ -124,6 +154,63 @@
         mobileMenuClose.addEventListener("click", function () {
           mobileMenu.classList.remove("active");
         });
+
+        // Toggle dropdown menu
+        if (dropdownToggle) {
+          dropdownToggle.addEventListener("click", function(e) {
+            e.preventDefault();
+            const parent = this.parentNode;
+            parent.classList.toggle("active");
+          });
+        }
+
+        // Toggle mobile dropdown menu
+        if (mobileDropdownToggle) {
+          mobileDropdownToggle.addEventListener("click", function(e) {
+            e.preventDefault();
+            const parent = this.parentNode;
+            parent.classList.toggle("active");
+          });
+        }
+
+        // Handle user type selection
+        userTypeLinks.forEach(link => {
+          link.addEventListener("click", function(e) {
+            e.preventDefault();
+            const userType = this.getAttribute("data-type");
+            currentUserType = userType;
+            
+            // Update dropdown text
+            if (dropdownToggle) {
+              dropdownToggle.innerHTML = `I am a ${userType === 'jobseeker' ? 'Job Seeker' : 'Recruiter'} <span class="dropdown-arrow">▼</span>`;
+            }
+            
+            if (mobileDropdownToggle) {
+              mobileDropdownToggle.innerHTML = `I am a ${userType === 'jobseeker' ? 'Job Seeker' : 'Recruiter'} <span class="dropdown-arrow">▼</span>`;
+            }
+            
+            // Update login/signup URLs
+            updateAuthLinks(userType);
+            
+            // Close dropdown
+            document.querySelector(".dropdown").classList.remove("active");
+            document.querySelector(".mobile-dropdown").classList.remove("active");
+          });
+        });
+
+        // Function to update auth links based on user type
+        function updateAuthLinks(userType) {
+          // Update desktop auth links
+          loginBtn.href = `/login/${userType}`;
+          signupBtn.href = `/signup/${userType}`;
+          
+          // Update mobile auth links
+          mobileLoginBtn.href = `/login/${userType}`;
+          mobileSignupBtn.href = `/signup/${userType}`;
+        }
+
+        // Initialize auth links with default user type
+        updateAuthLinks(currentUserType);
       });
     </script>
   </body>

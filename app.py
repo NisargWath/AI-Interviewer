@@ -50,13 +50,33 @@ QUESTION_BANK = [
 @app.route('/')
 def index():
     return render_template('index.html')
-@app.route('/login')
-def login():
-    return render_template('login.html')
-@app.route('/signup')
-def signup():
-    return render_template('signup.html')
+# @app.route('/login')
+# def login():
+#     return render_template('login.html')
+# @app.route('/signup')
+# def signup():
+#     return render_template('signup.html')
 
+############################
+
+# Changes for Login and Signup Pages for Seeker and Recruiter 
+@app.route('/jobseeker-register')
+def jobseeker_register():
+    return render_template('jobseeker-register.html')
+
+@app.route('/jobrecruiter-register')
+def jobrecruiter_register():
+    return render_template('jobrecruiter-register.html')
+
+@app.route('/jobseeker-login')
+def jobseeker_login():
+    return render_template('jobseeker-login.html')
+
+@app.route('/jobrecruiter-login')
+def jobrecruiter_login():
+    return render_template('jobrecruiter-login.html')
+
+########################################3
 @app.route("/phase1")
 def phase1():
     return render_template("phase1.html")
