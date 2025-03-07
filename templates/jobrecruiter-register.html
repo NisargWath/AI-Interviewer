@@ -1,81 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recruiter Registration - Job Portal</title>
-    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css" />
+  </head>
+  <body>
     <div class="form-container">
-        <h2>Recruiter Registration</h2>
-        <form id="recruiterForm">
-            <div class="form-group">
-                <label for="companyName">Company Name:</label>
-                <input type="text" id="companyName" name="companyName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fullName">Your Full Name:</label>
-                <input type="text" id="fullName" name="fullName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number:</label>
-                <input type="tel" id="phone" name="phone" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="industry">Industry:</label>
-                <select id="industry" name="industry" required>
-                    <option value="">Select an industry</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Education">Education</option>
-                    <option value="Manufacturing">Manufacturing</option>
-                    <option value="Retail">Retail</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="companySize">Company Size:</label>
-                <select id="companySize" name="companySize" required>
-                    <option value="">Select company size</option>
-                    <option value="1-10">1-10 employees</option>
-                    <option value="11-50">11-50 employees</option>
-                    <option value="51-200">51-200 employees</option>
-                    <option value="201-500">201-500 employees</option>
-                    <option value="501+">501+ employees</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="companyLocation">Company Location:</label>
-                <input type="text" id="companyLocation" name="companyLocation" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-            </div>
-            
-            <button type="submit" class="btn">Register as Recruiter</button>
-        </form>
-        <p class="form-footer">Already have a recruiter account? <a href="/jobrecruiter-login">Login here</a></p>
-        <p class="form-footer">Are you a job seeker? <a href="/jobseeker-register">Register as job seeker</a></p>
+      <h2>Recruiter Registration</h2>
+      <form id="recruiterForm" action="/jobrecruiter-register" method="POST">
+        <div class="form-group">
+          <label for="companyName">Company Name:</label>
+          <input type="text" id="companyName" name="companyName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="fullName">Your Full Name:</label>
+          <input type="text" id="fullName" name="fullName" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number:</label>
+          <input type="tel" id="phone" name="phone" required />
+        </div>
+
+        <div class="form-group">
+          <label for="industry">Industry:</label>
+          <select id="industry" name="industry" required>
+            <option value="">Select an industry</option>
+            <option value="Technology">Technology</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Finance">Finance</option>
+            <option value="Education">Education</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Retail">Retail</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="companySize">Company Size:</label>
+          <select id="companySize" name="companySize" required>
+            <option value="">Select company size</option>
+            <option value="1-10">1-10 employees</option>
+            <option value="11-50">11-50 employees</option>
+            <option value="51-200">51-200 employees</option>
+            <option value="201-500">201-500 employees</option>
+            <option value="501+">501+ employees</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="companyLocation">Company Location:</label>
+          <input
+            type="text"
+            id="companyLocation"
+            name="companyLocation"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn">Register as Recruiter</button>
+      </form>
+      <p class="form-footer">
+        Already have a recruiter account?
+        <a href="/jobrecruiter-login">Login here</a>
+      </p>
+      <p class="form-footer">
+        Are you a job seeker?
+        <a href="/jobseeker-register">Register as job seeker</a>
+      </p>
     </div>
     <script src="script.js"></script>
-</body>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get the form elements
+        const jobSeekerRegForm = document.getElementById("jobForm");
+        const recruiterRegForm = document.getElementById("recruiterForm");
+        const loginForm = document.getElementById("loginForm");
+
+        // Handle Job Seeker Registration
+        if (jobSeekerRegForm) {
+          jobSeekerRegForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Validate password
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+              document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+              alert("Passwords do not match!");
+              return;
+            }
+
+            // Submit the form
+            this.submit();
+          });
+        }
+
+        // Handle Recruiter Registration
+        if (recruiterRegForm) {
+          recruiterRegForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Validate password
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+              document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+              alert("Passwords do not match!");
+              return;
+            }
+
+            // Submit the form
+            this.submit();
+          });
+        }
+
+        // Handle Login
+        if (loginForm) {
+          loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Submit the form
+            this.submit();
+          });
+        }
+      });
+    </script>
+  </body>
 </html>

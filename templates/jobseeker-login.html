@@ -1,32 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Job Application Portal</title>
-    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css" />
+  </head>
+  <body>
     <div class="form-container">
-        <h2>Job Seeker Login</h2>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            
-            <input type="hidden" name="userType" value="jobseeker">
-            
-            <button type="submit" class="btn">Login</button>
-        </form>
-        <p class="form-footer">Don't have an account? <a href="/">Register here</a></p>
-        <p class="form-footer user-type-switch">Are you a recruiter? <a href="/jobrecruiter-login">Login as recruiter</a></p>
+      <h2>Job Seeker Login</h2>
+      <form id="loginForm" action="/jobseeker-login" method="POST">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <input type="hidden" name="userType" value="jobseeker" />
+
+        <button type="submit" class="btn">Login</button>
+      </form>
+      <p class="form-footer">
+        Don't have an account? <a href="/">Register here</a>
+      </p>
+      <p class="form-footer user-type-switch">
+        Are you a recruiter?
+        <a href="/jobrecruiter-login">Login as recruiter</a>
+      </p>
     </div>
     <script src="script.js"></script>
-</body>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get the form elements
+        const jobSeekerRegForm = document.getElementById("jobForm");
+        const recruiterRegForm = document.getElementById("recruiterForm");
+        const loginForm = document.getElementById("loginForm");
+
+        // Handle Job Seeker Registration
+        if (jobSeekerRegForm) {
+          jobSeekerRegForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Validate password
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+              document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+              alert("Passwords do not match!");
+              return;
+            }
+
+            // Submit the form
+            this.submit();
+          });
+        }
+
+        // Handle Recruiter Registration
+        if (recruiterRegForm) {
+          recruiterRegForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Validate password
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+              document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+              alert("Passwords do not match!");
+              return;
+            }
+
+            // Submit the form
+            this.submit();
+          });
+        }
+
+        // Handle Login
+        if (loginForm) {
+          loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Submit the form
+            this.submit();
+          });
+        }
+      });
+    </script>
+  </body>
 </html>

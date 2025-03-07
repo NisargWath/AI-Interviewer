@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Behavioral Assessment</title>
+    <link rel="stylesheet" href="../static/style/card-style.css" />
+    <script src="../static/javascript/card-script.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="card-header">
+          <h1 class="test-name">Behavioral Analysis Test</h1>
+          <div class="question-container">
+            <h2 class="question" id="question">
+              I find it challenging to draw astute conclusions from muddled
+              information.
+            </h2>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="options">
+            <button class="option" value="1">
+              <span class="option-text">Strongly Disagree</span>
+              <span class="option-icon"
+                ><i class="fas fa-thumbs-down"></i
+              ></span>
+            </button>
+            <button class="option" value="2">
+              <span class="option-text">Disagree</span>
+            </button>
+            <button class="option" value="3">
+              <span class="option-text">Somewhat Disagree</span>
+            </button>
+            <button class="option" value="4">
+              <span class="option-text">Neither Agree nor Disagree</span>
+            </button>
+            <button class="option" value="5">
+              <span class="option-text">Somewhat Agree</span>
+            </button>
+            <button class="option" value="6">
+              <span class="option-text">Agree</span>
+            </button>
+            <button class="option" value="7">
+              <span class="option-text">Strongly Agree</span>
+              <span class="option-icon"><i class="fas fa-thumbs-up"></i></span>
+            </button>
+          </div>
+          <div class="navigation">
+            <button class="nav-button" id="backButton">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button class="nav-button primary" id="nextButton">
+              Next <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -3,3 +3,4 @@ static/uploads
 /myenv
 login.html
 signup.html
+static/server/node_modules

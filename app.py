@@ -1,6 +1,8 @@
 # app.py
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_pymongo import PyMongo
 import os
 import json
 import uuid
@@ -28,7 +30,15 @@ app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
 app.config['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')
-x
+
+# MongoDB configuration
+app.config["MONGO_URI"] = os.getenv('MONGO_URI', "mongodb://localhost:27017/jobportal")
+mongo = PyMongo(app)
+
+# Define database collections
+job_seekers = mongo.db.jobseekers
+job_recruiters = mongo.db.recruiters
+
 # Initialize Gemini API
 genai.configure(api_key=app.config['GEMINI_API_KEY'])
 
@@ -50,39 +60,177 @@ QUESTION_BANK = [
 @app.route('/')
 def index():
     return render_template('index.html')
-# @app.route('/login')
-# def login():
-#     return render_template('login.html')
-# @app.route('/signup')
-# def signup():
-#     return render_template('signup.html')
+
+@app.route('/behavoural')
+def behavoural():
+    return render_template('behavoural.html')
 
 ############################
+# Login and Registration Routes for Job Seekers and Recruiters
 
-# Changes for Login and Signup Pages for Seeker and Recruiter 
-@app.route('/jobseeker-register')
+@app.route('/jobseeker-register', methods=['GET', 'POST'])
 def jobseeker_register():
+    if request.method == 'POST':
+        # Get form data
+        full_name = request.form.get('fullName')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        experience = request.form.get('experience')
+        skills = request.form.get('skills')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirmPassword')
+        
+        # Validate passwords match
+        if password != confirm_password:
+            flash('Passwords do not match!')
+            return render_template('jobseeker-register.html')
+        
+        # Check if user already exists
+        existing_user = job_seekers.find_one({'email': email})
+        if existing_user:
+            flash('Email already exists. Please login.')
+            return redirect(url_for('jobseeker_login'))
+        
+        # Create new user
+        new_user = {
+            'fullName': full_name,
+            'email': email,
+            'phone': phone,
+            'experience': experience,
+            'skills': skills,
+            'password': generate_password_hash(password),
+            'created_at': datetime.datetime.now()
+        }
+        
+        # Handle resume upload if included
+        if 'resume' in request.files:
+            resume = request.files['resume']
+            if resume.filename != '':
+                filename = secure_filename(f"{email}_{resume.filename}")
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                resume.save(filepath)
+                new_user['resume_path'] = filepath
+        
+        # Insert user into database
+        job_seekers.insert_one(new_user)
+        flash('Registration successful! Please login.')
+        return redirect(url_for('jobseeker_login'))
+    
     return render_template('jobseeker-register.html')
 
-@app.route('/jobrecruiter-register')
-def jobrecruiter_register():
-    return render_template('jobrecruiter-register.html')
-
-@app.route('/jobseeker-login')
+@app.route('/jobseeker-login', methods=['GET', 'POST'])
 def jobseeker_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # Find user in database
+        user = job_seekers.find_one({'email': email})
+        
+        # Check if user exists and password is correct
+        if user and check_password_hash(user['password'], password):
+            # Create session
+            session['user_id'] = str(user['_id'])
+            session['user_type'] = 'jobseeker'
+            session['user_name'] = user['fullName']
+            flash('Login successful!')
+            return redirect(url_for('behavoural'))
+        else:
+            flash('Invalid email or password')
+    
     return render_template('jobseeker-login.html')
 
-@app.route('/jobrecruiter-login')
+@app.route('/jobrecruiter-register', methods=['GET', 'POST'])
+def jobrecruiter_register():
+    if request.method == 'POST':
+        # Get form data
+        company_name = request.form.get('companyName')
+        full_name = request.form.get('fullName')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        industry = request.form.get('industry')
+        company_size = request.form.get('companySize')
+        company_location = request.form.get('companyLocation')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirmPassword')
+        
+        # Validate passwords match
+        if password != confirm_password:
+            flash('Passwords do not match!')
+            return render_template('jobrecruiter-register.html')
+        
+        # Check if recruiter already exists
+        existing_recruiter = job_recruiters.find_one({'email': email})
+        if existing_recruiter:
+            flash('Email already exists. Please login.')
+            return redirect(url_for('jobrecruiter_login'))
+        
+        # Create new recruiter
+        new_recruiter = {
+            'companyName': company_name,
+            'fullName': full_name,
+            'email': email,
+            'phone': phone,
+            'industry': industry,
+            'companySize': company_size,
+            'companyLocation': company_location,
+            'password': generate_password_hash(password),
+            'created_at': datetime.datetime.now()
+        }
+        
+        # Insert recruiter into database
+        job_recruiters.insert_one(new_recruiter)
+        flash('Registration successful! Please login.')
+        return redirect(url_for('jobrecruiter_login'))
+    
+    return render_template('jobrecruiter-register.html')
+
+@app.route('/jobrecruiter-login', methods=['GET', 'POST'])
 def jobrecruiter_login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # Find recruiter in database
+        recruiter = job_recruiters.find_one({'email': email})
+        
+        # Check if recruiter exists and password is correct
+        if recruiter and check_password_hash(recruiter['password'], password):
+            # Create session
+            session['user_id'] = str(recruiter['_id'])
+            session['user_type'] = 'recruiter'
+            session['user_name'] = recruiter['fullName']
+            flash('Login successful!')
+            return redirect(url_for('index'))  # Redirect to recruiter dashboard in the future
+        else:
+            flash('Invalid email or password')
+    
     return render_template('jobrecruiter-login.html')
 
-########################################3
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.')
+    return redirect(url_for('index'))
+
+########################################
+# Interview Process Routes
+
 @app.route("/phase1")
 def phase1():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        flash('Please login to access this page.')
+        return redirect(url_for('jobseeker_login'))
+    
     return render_template("phase1.html")
 
 @app.route('/start-interview', methods=['POST'])
 def start_interview():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return jsonify({'error': 'Please login to start an interview'}), 401
+    
     # Create a unique interview session
     interview_id = str(uuid.uuid4())
     session['interview_id'] = interview_id
@@ -112,6 +260,17 @@ def start_interview():
             questions = random.sample(QUESTION_BANK, 4)
         
         session['questions'] = questions
+        
+        # Save interview to database
+        interview_data = {
+            'interview_id': interview_id,
+            'user_id': session['user_id'],
+            'position': position,
+            'experience': experience,
+            'questions': questions,
+            'started_at': datetime.datetime.now()
+        }
+        mongo.db.interviews.insert_one(interview_data)
         
         return redirect(url_for('interview'))
     except Exception as e:
@@ -163,6 +322,17 @@ def submit_answer():
         # Analyze video with actual processing
         analysis = analyze_video(filepath, session['questions'][session['current_question']])
         session['analysis'].append(analysis)
+        
+        # Store answer in database
+        answer_data = {
+            'interview_id': session['interview_id'],
+            'question_idx': session['current_question'],
+            'question': session['questions'][session['current_question']],
+            'video_path': filepath,
+            'analysis': analysis,
+            'submitted_at': datetime.datetime.now()
+        }
+        mongo.db.interview_answers.insert_one(answer_data)
         
         # Move to next question
         session['current_question'] += 1
@@ -421,6 +591,18 @@ def results():
                 "interview_score": 75,
                 "hiring_recommendation": "Consider for next round"
             }
+            
+        # Save results to database
+        results_data = {
+            'interview_id': session['interview_id'],
+            'user_id': session['user_id'],
+            'questions': questions,
+            'analysis': analysis,
+            'overall_summary': overall_summary,
+            'completed_at': datetime.datetime.now()
+        }
+        mongo.db.interview_results.insert_one(results_data)
+        
     except Exception as e:
         logger.error(f"Error generating summary: {str(e)}")
         # Fallback summary
@@ -460,17 +642,3 @@ def download_report():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
