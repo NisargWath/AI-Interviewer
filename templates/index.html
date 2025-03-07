@@ -17,16 +17,9 @@
         <nav>
           <ul class="nav-links">
             <li><a href="#">Explore</a></li>
-            <li><a href="#">Resources</a></li>
-            <li><a href="#">Teams</a></li>
+            <li><a href="#resource-section">Resources</a></li>
+            <li><a href="#stats-section">Teams</a></li>
             <li><a href="#">Pricing</a></li>
-            <!-- <li class="dropdown">
-              <a href="#" class="dropdown-toggle">I am a <span class="dropdown-arrow">▼</span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#" class="user-type" data-type="jobseeker">Job Seeker</a></li>
-                <li><a href="#" class="user-type" data-type="recruiter">Recruiter</a></li>
-              </ul>
-            </li> -->
           </ul>
           <div class="auth-buttons">
             <a href="/login" class="login-btn" id="login-btn">Log in</a>
@@ -44,20 +37,32 @@
         <button class="mobile-menu-close">✕</button>
         <ul class="mobile-nav-links">
           <li><a href="#">Explore</a></li>
-          <li><a href="#">Resources</a></li>
-          <li><a href="#">Teams</a></li>
+          <li><a href="#resource-section">Resources</a></li>
+          <li><a href="#stats-section">Teams</a></li>
           <li><a href="#">Pricing</a></li>
           <li class="mobile-dropdown">
-            <a href="#" class="mobile-dropdown-toggle">I am a <span class="dropdown-arrow">▼</span></a>
+            <a href="#" class="mobile-dropdown-toggle"
+              >I am a <span class="dropdown-arrow">▼</span></a
+            >
             <ul class="mobile-dropdown-menu">
-              <li><a href="#" class="user-type" data-type="jobseeker">Job Seeker</a></li>
-              <li><a href="#" class="user-type" data-type="recruiter">Recruiter</a></li>
+              <li>
+                <a href="#" class="user-type" data-type="jobseeker"
+                  >Job Seeker</a
+                >
+              </li>
+              <li>
+                <a href="#" class="user-type" data-type="recruiter"
+                  >Recruiter</a
+                >
+              </li>
             </ul>
           </li>
         </ul>
         <div class="mobile-auth-buttons">
           <a href="#" class="mobile-login-btn" id="mobile-login-btn">Log in</a>
-          <a href="#" class="mobile-signup-btn" id="mobile-signup-btn">Sign Up</a>
+          <a href="#" class="mobile-signup-btn" id="mobile-signup-btn"
+            >Sign Up</a
+          >
         </div>
       </div>
 
@@ -69,8 +74,18 @@
           Interviewed & Analyzed Instantly !<br />
           <!-- <div class="highlight-box">Bestie 🤝</div> -->
           <div class="auth-buttons">
-            <a href="/jobseeker-register" class="login-btn highlight-box" id="login-btn">Sign up as Candidate → </a>
-            <a href="/jobrecruiter-register" class="signup-btn highlight-box" id="signup-btn">Sign up as Business → </a>
+            <a
+              href="/jobseeker-register"
+              class="login-btn highlight-box"
+              id="login-btn"
+              >Sign up as Candidate →
+            </a>
+            <a
+              href="/jobrecruiter-register"
+              class="signup-btn highlight-box"
+              id="signup-btn"
+              >Sign up as Business →
+            </a>
           </div>
         </h1>
         <p class="hero-description">
@@ -92,37 +107,383 @@
             <span class="plan-icon">🎤</span>
             <h3 class="plan-name">AI-Powered Interviewing</h3>
             <p class="plan-description">
-              Conducts real-time behavioral & technical interviews.
-              Uses <em>NLP & sentiment analysis</em> to evaluate responses.
+              Conducts real-time behavioral & technical interviews. Uses
+              <em>NLP & sentiment analysis</em> to evaluate responses.
             </p>
           </div>
           <div class="plan-card">
             <span class="plan-icon">📹</span>
             <h3 class="plan-name">Video-Based Assessments</h3>
             <p class="plan-description">
-              Candidates answer <em>live interview questions on video</em>.
-              AI analyzes tone, confidence, and <em>facial expressions</em>.
+              Candidates answer <em>live interview questions on video</em>. AI
+              analyzes tone, confidence, and <em>facial expressions</em>.
             </p>
           </div>
           <div class="plan-card">
             <span class="plan-icon">🧠</span>
             <h3 class="plan-name">Smart Skill-Based Quiz</h3>
             <p class="plan-description">
-              Dynamically generated <em>MCQs and coding questions</em> based on job role.
-              AI adapts difficulty based on candidate performance.
+              Dynamically generated <em>MCQs and coding questions</em> based on
+              job role. AI adapts difficulty based on candidate performance.
             </p>
           </div>
           <div class="plan-card">
             <span class="plan-icon">📊</span>
             <h3 class="plan-name">AI-Driven Scoring & Insights</h3>
             <p class="plan-description">
-              Provides <em>detailed reports</em> on technical & soft skills.
-              AI assigns <em>generalized scores</em> for easy ranking.
+              Provides <em>detailed reports</em> on technical & soft skills. AI
+              assigns <em>generalized scores</em> for easy ranking.
             </p>
           </div>
         </div>
       </section>
     </div>
+
+    <!-- Resources -->
+    <div id="resource-section" class="container-acc">
+      <div class="accordion">
+        <div class="accordion-header" data-accordion="1">
+          <span>Getting Started with AI Interviewer</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="accordion-icon"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="accordion-content" data-content="1">
+          <p>
+            Welcome to AI Interviewer! This platform leverages advanced
+            artificial intelligence to help recruiters streamline their
+            interview process.
+          </p>
+          <p>As a new user, here's how to get started:</p>
+          <ul
+            style="
+              padding-left: 1.5rem;
+              margin-top: 0.75rem;
+              margin-bottom: 0.75rem;
+            "
+          >
+            <li>Create your organization profile</li>
+            <li>Set up interview templates</li>
+            <li>Invite candidates to take automated interviews</li>
+            <li>Review AI-analyzed results</li>
+          </ul>
+          <p>
+            Our AI uses natural language processing to evaluate candidate
+            responses based on clarity, relevance, and depth of knowledge.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" data-accordion="2">
+          <span>Understanding AI Analysis</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="accordion-icon"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="accordion-content" data-content="2">
+          <p>
+            Our AI interview system uses several advanced algorithms to analyze
+            candidate responses:
+          </p>
+          <h4 style="margin-top: 1rem; font-weight: 500">Sentiment Analysis</h4>
+          <p>
+            Measures the emotional tone of responses to determine confidence,
+            enthusiasm, and attitude.
+          </p>
+          <h4 style="margin-top: 1rem; font-weight: 500">
+            Technical Knowledge Assessment
+          </h4>
+          <p>
+            Evaluates responses against a database of industry-standard concepts
+            and practices.
+          </p>
+          <h4 style="margin-top: 1rem; font-weight: 500">
+            Communication Proficiency
+          </h4>
+          <p>
+            Analyzes clarity, conciseness, and articulation of complex ideas.
+          </p>
+          <h4 style="margin-top: 1rem; font-weight: 500">
+            Behavioral Pattern Recognition
+          </h4>
+          <p>
+            Identifies patterns in responses that correlate with successful
+            employees in similar roles.
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" data-accordion="3">
+          <span>Frequently Asked Questions</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="accordion-icon"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="accordion-content" data-content="3">
+          <div style="margin-bottom: 1rem">
+            <h4 style="font-weight: 500">
+              Is the AI biased in its evaluations?
+            </h4>
+            <p>
+              Our AI is continuously trained to minimize bias. We regularly
+              audit the system with diverse candidate pools to ensure fairness
+              across demographics.
+            </p>
+          </div>
+          <div style="margin-bottom: 1rem">
+            <h4 style="font-weight: 500">
+              How secure are candidate interviews?
+            </h4>
+            <p>
+              All data is encrypted end-to-end, and we comply with GDPR, CCPA,
+              and other privacy regulations. Interviews are only accessible to
+              authorized recruiters.
+            </p>
+          </div>
+          <div style="margin-bottom: 1rem">
+            <h4 style="font-weight: 500">
+              Can we customize questions for specific roles?
+            </h4>
+            <p>
+              Yes, you can create custom question banks for different positions,
+              departments, and seniority levels.
+            </p>
+          </div>
+          <div>
+            <h4 style="font-weight: 500">
+              How accurate is the AI in predicting job performance?
+            </h4>
+            <p>
+              Our system has shown a 78% correlation between interview scores
+              and 6-month performance reviews in benchmark studies.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resource Library -->
+      <h3 style="margin: 2.5rem 0 1.5rem; font-weight: 600; font-size: 1.25rem">
+        Resource Library
+      </h3>
+
+      <div class="resource-grid">
+        <div class="resource-card fade-in" style="animation-delay: 0.1s">
+          <h2>AI & NLP Documentation</h2>
+          <p>
+            Comprehensive guide on how our AI processes candidate responses,
+            including our natural language processing methodology and scoring
+            algorithms.
+          </p>
+          <div class="tags">
+            <span class="tag">Technical</span>
+            <span class="tag">AI</span>
+          </div>
+          <div class="resource-actions">
+            <button class="button">Read Documentation</button>
+          </div>
+        </div>
+
+        <div class="resource-card fade-in" style="animation-delay: 0.2s">
+          <h2>Interview Question Bank</h2>
+          <p>
+            Access a rich collection of technical and behavioral interview
+            questions categorized by role, seniority, and skill set. Includes
+            suggested evaluation criteria.
+          </p>
+          <div class="tags">
+            <span class="tag">Questions</span>
+            <span class="tag">Templates</span>
+          </div>
+          <div class="resource-actions">
+            <button class="button">Explore Questions</button>
+          </div>
+        </div>
+
+        <div class="resource-card fade-in" style="animation-delay: 0.3s">
+          <h2>Recruiter Dashboard Guide</h2>
+          <p>
+            Learn how to use the AI-powered recruiter dashboard effectively,
+            including candidate comparison tools, analytics features, and
+            reporting functions.
+          </p>
+          <div class="tags">
+            <span class="tag">User Guide</span>
+            <span class="tag">Analytics</span>
+          </div>
+          <div class="resource-actions">
+            <button class="button">View Guide</button>
+          </div>
+        </div>
+
+        <!-- <div class="resource-card fade-in" style="animation-delay: 0.4s">
+          <h2>Candidate Experience Best Practices</h2>
+          <p>
+            Optimize your automated interview process to create a positive
+            candidate experience with communication templates and follow-up
+            strategies.
+          </p>
+          <div class="tags">
+            <span class="tag">Best Practices</span>
+            <span class="tag">Engagement</span>
+          </div>
+          <div class="resource-actions">
+            <button class="button">Read Guide</button>
+          </div>
+        </div> -->
+      </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <section id="stats-section" class="stats-section">
+      <div class="container">
+        <div class="stats-heading">
+          <h2>Trusted by professionals worldwide</h2>
+          <p>
+            Join thousands of candidates and recruiters already using our
+            platform
+          </p>
+        </div>
+        <div class="stats-container">
+          <div class="stat-card fade-in">
+            <div class="stat-icon">👩‍💼</div>
+            <div class="stat-value" id="candidate-count">0</div>
+            <div class="stat-label">Registered Candidates</div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-icon">🏢</div>
+            <div class="stat-value" id="recruiter-count">0</div>
+            <div class="stat-label">Active Recruiters</div>
+          </div>
+          <div class="stat-card fade-in">
+            <div class="stat-icon">🤝</div>
+            <div class="stat-value" id="interview-count">0</div>
+            <div class="stat-label">Interviews Conducted</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Client Reviews Section -->
+    <section class="reviews-section">
+      <div class="container">
+        <div class="reviews-heading">
+          <h2>What our clients say</h2>
+          <p>See how IntervoAI has transformed hiring processes</p>
+        </div>
+        
+        <div class="reviews-carousel-container">
+          <div class="reviews-carousel">
+            <!-- Review Cards -->
+            <div class="review-card">
+              <div class="review-content">
+                <div class="review-stars">★★★★★</div>
+                <p>"IntervoAI cut our hiring time by 60%. The AI assessment scores accurately predicted top performers."</p>
+                <div class="review-author">
+                  <img src="https://i.pravatar.cc/150?img=1" alt="Sarah J." class="avatar">
+                  <div>
+                    <h4>Sarah Johnson</h4>
+                    <p>HR Director, TechCorp</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-content">
+                <div class="review-stars">★★★★★</div>
+                <p>"As a startup founder, I need to hire efficiently. IntervoAI helps me pre-screen candidates with remarkable accuracy."</p>
+                <div class="review-author">
+                  <img src="https://i.pravatar.cc/150?img=2" alt="Sarah J." class="avatar">
+                  <div>
+                    <h4>Michael Chen</h4>
+                    <p>CEO, LaunchBox</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-content">
+                <div class="review-stars">★★★★☆</div>
+                <p>"The platform's skill assessments helped me identify areas for improvement. I landed my dream job after three practice sessions!"</p>
+                <div class="review-author">
+                  <img src="https://i.pravatar.cc/150?img=3" alt="Sarah J." class="avatar">
+                  <div>
+                    <h4>Priya Mehta</h4>
+                    <p>Software Engineer</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-content">
+                <div class="review-stars">★★★★★</div>
+                <p>"Our recruitment team loves the detailed candidate reports. We've improved our quality of hire by 42% in six months."</p>
+                <div class="review-author">
+                  <img src="https://i.pravatar.cc/150?img=4" alt="Sarah J." class="avatar">
+                  <div>
+                    <h4>David Lewis</h4>
+                    <p>Talent Acquisition Manager</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-content">
+                <div class="review-stars">★★★★★</div>
+                <p>"The behavioral analysis component has been invaluable in identifying candidates who are the right culture fit."</p>
+                <div class="review-author">
+                  <img src="https://i.pravatar.cc/150?img=5" alt="Sarah J." class="avatar">
+                  <div>
+                    <h4>Elena Rodriguez</h4>
+                    <p>People Operations, GrowthCo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
 
     <footer>
       <div class="footer-bottom">
@@ -141,8 +502,10 @@
         const mobileLoginBtn = document.getElementById("mobile-login-btn");
         const mobileSignupBtn = document.getElementById("mobile-signup-btn");
         const dropdownToggle = document.querySelector(".dropdown-toggle");
-        const mobileDropdownToggle = document.querySelector(".mobile-dropdown-toggle");
-        
+        const mobileDropdownToggle = document.querySelector(
+          ".mobile-dropdown-toggle"
+        );
+
         // Default user type
         let currentUserType = "jobseeker";
 
@@ -157,7 +520,7 @@
 
         // Toggle dropdown menu
         if (dropdownToggle) {
-          dropdownToggle.addEventListener("click", function(e) {
+          dropdownToggle.addEventListener("click", function (e) {
             e.preventDefault();
             const parent = this.parentNode;
             parent.classList.toggle("active");
@@ -166,7 +529,7 @@
 
         // Toggle mobile dropdown menu
         if (mobileDropdownToggle) {
-          mobileDropdownToggle.addEventListener("click", function(e) {
+          mobileDropdownToggle.addEventListener("click", function (e) {
             e.preventDefault();
             const parent = this.parentNode;
             parent.classList.toggle("active");
@@ -174,27 +537,33 @@
         }
 
         // Handle user type selection
-        userTypeLinks.forEach(link => {
-          link.addEventListener("click", function(e) {
+        userTypeLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
             e.preventDefault();
             const userType = this.getAttribute("data-type");
             currentUserType = userType;
-            
+
             // Update dropdown text
             if (dropdownToggle) {
-              dropdownToggle.innerHTML = `I am a ${userType === 'jobseeker' ? 'Job Seeker' : 'Recruiter'} <span class="dropdown-arrow">▼</span>`;
+              dropdownToggle.innerHTML = `I am a ${
+                userType === "jobseeker" ? "Job Seeker" : "Recruiter"
+              } <span class="dropdown-arrow">▼</span>`;
             }
-            
+
             if (mobileDropdownToggle) {
-              mobileDropdownToggle.innerHTML = `I am a ${userType === 'jobseeker' ? 'Job Seeker' : 'Recruiter'} <span class="dropdown-arrow">▼</span>`;
+              mobileDropdownToggle.innerHTML = `I am a ${
+                userType === "jobseeker" ? "Job Seeker" : "Recruiter"
+              } <span class="dropdown-arrow">▼</span>`;
             }
-            
+
             // Update login/signup URLs
             updateAuthLinks(userType);
-            
+
             // Close dropdown
             document.querySelector(".dropdown").classList.remove("active");
-            document.querySelector(".mobile-dropdown").classList.remove("active");
+            document
+              .querySelector(".mobile-dropdown")
+              .classList.remove("active");
           });
         });
 
@@ -203,7 +572,7 @@
           // Update desktop auth links
           loginBtn.href = `/login/${userType}`;
           signupBtn.href = `/signup/${userType}`;
-          
+
           // Update mobile auth links
           mobileLoginBtn.href = `/login/${userType}`;
           mobileSignupBtn.href = `/signup/${userType}`;
@@ -212,6 +581,148 @@
         // Initialize auth links with default user type
         updateAuthLinks(currentUserType);
       });
+
+      // Accordion functionality
+      const accordionHeaders = document.querySelectorAll(".accordion-header");
+
+      accordionHeaders.forEach((header) => {
+        header.addEventListener("click", function () {
+          const accordionId = this.getAttribute("data-accordion");
+          const content = document.querySelector(
+            `.accordion-content[data-content="${accordionId}"]`
+          );
+
+          // Toggle active class on header
+          this.classList.toggle("active");
+
+          // Toggle content
+          content.classList.toggle("active");
+
+          // Handle the icon rotation through the active class on the header
+        });
+      });
+
+      // Animation for resource cards on scroll
+      const resourceCards = document.querySelectorAll(".resource-card");
+
+      // Simple function to check if element is in viewport
+      function isInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.top <=
+            (window.innerHeight || document.documentElement.clientHeight) &&
+          rect.bottom >= 0
+        );
+      }
+
+      // Function to handle scroll animation
+      function handleScroll() {
+        resourceCards.forEach((card) => {
+          if (isInViewport(card)) {
+            card.classList.add("fade-in");
+          }
+        });
+      }
+
+      // Initial check on page load
+      handleScroll();
+
+      // Check on scroll
+      window.addEventListener("scroll", handleScroll);
     </script>
+
+    <!--  -->
+    <!-- This is a script for the statistics section of the landing page  -->
+    <!--  -->
+    <script>
+      // Counter animation for statistics
+      document.addEventListener("DOMContentLoaded", function () {
+        const candidateTarget = 5480;
+        const recruiterTarget = 873;
+        const interviewTarget = 24650;
+
+        const candidateCounter = document.getElementById("candidate-count");
+        const recruiterCounter = document.getElementById("recruiter-count");
+        const interviewCounter = document.getElementById("interview-count");
+
+        function animateCounter(element, target) {
+          const duration = 2000; // 2 seconds
+          const frameRate = 60;
+          const totalFrames = (duration * frameRate) / 1000;
+          let frame = 0;
+
+          const counter = setInterval(() => {
+            frame++;
+            const progress = frame / totalFrames;
+            const currentCount = Math.round(progress * target);
+
+            if (frame === totalFrames) {
+              clearInterval(counter);
+              element.innerText = target.toLocaleString();
+            } else {
+              element.innerText = currentCount.toLocaleString();
+            }
+          }, 1000 / frameRate);
+        }
+
+        // Start the animation when element is in viewport
+        function handleCounterAnimation() {
+          const statSection = document.querySelector(".stats-section");
+          if (isInViewport(statSection)) {
+            animateCounter(candidateCounter, candidateTarget);
+            animateCounter(recruiterCounter, recruiterTarget);
+            animateCounter(interviewCounter, interviewTarget);
+            window.removeEventListener("scroll", handleCounterAnimation);
+          }
+        }
+
+        // Initial check and scroll listener
+        handleCounterAnimation();
+        window.addEventListener("scroll", handleCounterAnimation);
+      });
+    </script>
+
+    <!--  -->
+    <!-- Script for the client reviews section -->
+    <!--  -->
+    <script>
+      // Clone the review cards to create seamless infinite scroll effect
+      document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.querySelector('.reviews-carousel');
+        const cards = document.querySelectorAll('.review-card');
+        
+        // Clone cards and append to end for seamless loop
+        cards.forEach(card => {
+          const clone = card.cloneNode(true);
+          carousel.appendChild(clone);
+        });
+        
+        // Pause animation on hover
+        carousel.addEventListener('mouseenter', () => {
+          carousel.style.animationPlayState = 'paused';
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+          carousel.style.animationPlayState = 'running';
+        });
+        
+        // Check if viewport width changes and adjust carousel if needed
+        function handleResize() {
+          const viewportWidth = window.innerWidth;
+          if (viewportWidth <= 480) {
+            carousel.style.animationDuration = '15s';
+          } else if (viewportWidth <= 768) {
+            carousel.style.animationDuration = '20s';
+          } else {
+            carousel.style.animationDuration = '30s';
+          }
+        }
+        
+        // Initial setup and resize listener
+        handleResize();
+        window.addEventListener('resize', handleResize);
+      });
+    </script>
+
   </body>
 </html>
