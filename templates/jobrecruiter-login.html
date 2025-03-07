@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Login - Job Portal</title>
+    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Recruiter Login</h2>
+        <form id="recruiterLoginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <input type="hidden" name="userType" value="recruiter">
+            
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <p class="form-footer">Don't have a recruiter account? <a href="/jobrecruiter-register">Register here</a></p>
+        <p class="form-footer">Are you a job seeker? <a href="/jobseeker-login">Login as job seeker</a></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
