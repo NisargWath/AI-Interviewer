@@ -263,7 +263,7 @@ nav {
 .hero-title {
   font-size: 50px;
   font-weight: bold;
-  max-width: 800px;
+  max-width: 850px;
   margin: 0 auto 30px;
   position: relative;
 }
@@ -460,16 +460,18 @@ nav {
   }
 
   .highlight-box {
-    font-size: 30px;
+    font-size: 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .nav-links,
+  /* .nav-links,
   .auth-buttons {
     display: none;
+  } */
+  .nav-links{
+    display: none;
   }
-
   .mobile-menu-btn {
     display: block;
   }
@@ -483,7 +485,7 @@ nav {
   }
 
   .highlight-box {
-    font-size: 26px;
+    font-size: 20px;
     padding: 8px 20px;
   }
   
@@ -503,8 +505,8 @@ nav {
   }
 
   .highlight-box {
-    font-size: 22px;
-    padding: 6px 16px;
+    font-size: 16px;
+    padding: 6px 10px;
   }
 
   .profile-bubble {
