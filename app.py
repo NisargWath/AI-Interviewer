@@ -28,7 +28,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
 app.config['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')
-
+x
 # Initialize Gemini API
 genai.configure(api_key=app.config['GEMINI_API_KEY'])
 
