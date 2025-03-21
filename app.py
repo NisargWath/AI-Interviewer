@@ -65,6 +65,10 @@ def index():
 def behavoural():
     return render_template('behavoural.html')
 
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
 ############################
 # Login and Registration Routes for Job Seekers and Recruiters
 
@@ -201,7 +205,7 @@ def jobrecruiter_login():
             session['user_type'] = 'recruiter'
             session['user_name'] = recruiter['fullName']
             flash('Login successful!')
-            return redirect(url_for('index'))  # Redirect to recruiter dashboard in the future
+            return redirect(url_for('dashboard'))  # Redirect to recruiter dashboard in the future
         else:
             flash('Invalid email or password')
     
@@ -244,7 +248,7 @@ def start_interview():
         position = request.form.get('position', '')
         experience = request.form.get('experience', '')
         
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
         Generate 4 personalized interview questions for a {position} position with {experience} experience.
         The questions should be challenging but fair, and should help assess the candidate's fit for the role.
@@ -448,6 +452,7 @@ def analyze_facial_expressions(frames):
             "engagement_level": 5
         }
 
+# Improved version of analyze_video function
 def analyze_video(video_path, question):
     """Analyze video using real processing and Gemini AI"""
     try:
@@ -461,7 +466,7 @@ def analyze_video(video_path, question):
         facial_analysis = analyze_facial_expressions(frames)
         
         # Use Gemini to analyze the transcript and combine with facial analysis
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         prompt = f"""
         Analyze this interview response to the question: "{question}"
         
@@ -483,36 +488,47 @@ def analyze_video(video_path, question):
         """
         
         response = model.generate_content(prompt)
+        logger.info("Raw Gemini response: %s", response.text)
         
         try:
             # Try to parse Gemini's response as JSON
             analysis = json.loads(response.text)
             
-            # Ensure all required fields are present
-            required_fields = ['clarity_score', 'content_quality', 'strengths', 'areas_to_improve', 'overall_impression']
-            for field in required_fields:
+            # Ensure all required fields are present with dynamic defaults based on data we have
+            required_fields = {
+                'clarity_score': min(facial_analysis['confidence_score'] + 1, 10),  # Base on confidence
+                'content_quality': f"Response to question about {question[:30]}...",
+                'strengths': ["Communication skills", "Addressed the question", "Professional tone"],
+                'areas_to_improve': ["Consider providing more examples", "Structure could be improved"],
+                'overall_impression': f"Response addressed {question[:20]}... with partial effectiveness"
+            }
+            
+            for field, default_value in required_fields.items():
                 if field not in analysis:
-                    analysis[field] = "Not available"
+                    analysis[field] = default_value
+                    logger.warning(f"Missing field {field} in Gemini response, using dynamic default")
                     
             # Include facial analysis data
             analysis.update(facial_analysis)
             
         except json.JSONDecodeError:
-            # If Gemini doesn't return valid JSON, create our own structure
+            logger.error(f"Invalid JSON in Gemini response: {response.text}")
+            
+            # Create a dynamic analysis based on available data
             analysis = {
                 **facial_analysis,  # Include facial analysis results
-                "clarity_score": 6,
-                "content_quality": "Response addressed the question with some relevant points",
+                "clarity_score": facial_analysis['confidence_score'],  # Base clarity on confidence
+                "content_quality": f"Response to '{question[:50]}...' appears to include relevant content",
                 "strengths": [
-                    "Provided a structured response",
-                    "Included specific examples", 
-                    "Maintained professional language"
+                    f"Attempted to address the question about {question.split()[0:3]}...",
+                    "Provided verbal response",
+                    f"Maintained engagement level of {facial_analysis['engagement_level']}/10"
                 ],
                 "areas_to_improve": [
-                    "Could provide more detailed examples",
-                    "Consider a more concise delivery"
+                    "Response structure could be more clear",
+                    f"Address nervousness: {facial_analysis['nervousness_indicators']}"
                 ],
-                "overall_impression": "Overall satisfactory response with room for improvement"
+                "overall_impression": f"Response shows {facial_analysis['confidence_score']}/10 confidence level with transcript: '{transcript[:100]}...'"
             }
         
         # Store the transcript for later reference
@@ -522,19 +538,53 @@ def analyze_video(video_path, question):
         
     except Exception as e:
         logger.error(f"Error analyzing video: {str(e)}")
-        # Return fallback analysis
-        return {
-            "confidence_score": 6,
-            "nervousness_indicators": "Some hand movements suggest mild nervousness",
-            "engagement_level": 7,
-            "clarity_score": 6,
-            "content_quality": "Response addressed key points but lacked depth",
-            "strengths": ["Clear communication", "Structured response", "Professional demeanor"],
-            "areas_to_improve": ["Could provide more specific examples", "Consider reducing filler words"],
-            "overall_impression": "Satisfactory response with room for improvement",
-            "transcript": "Could not process speech from video"
-        }
+        
+        # Create a response based on partial data that might be available
+        partial_analysis = {}
+        
+        # Try to use any data we might have
+        try:
+            if 'facial_analysis' in locals():
+                partial_analysis.update(facial_analysis)
+            
+            if 'transcript' in locals():
+                partial_transcript = transcript[:200] + "..." if len(transcript) > 200 else transcript
+                partial_analysis['transcript'] = partial_transcript
+                
+                # Generate minimal analysis based on transcript
+                partial_analysis.update({
+                    "confidence_score": partial_analysis.get("confidence_score", 5),
+                    "engagement_level": partial_analysis.get("engagement_level", 5),
+                    "clarity_score": 5,  # Neutral score
+                    "content_quality": f"Partial analysis based on transcript: '{partial_transcript[:50]}...'",
+                    "strengths": ["Response provided", "Attempted to address question"],
+                    "areas_to_improve": ["Technical analysis incomplete", "Consider re-recording"],
+                    "overall_impression": "Analysis incomplete due to technical issues"
+                })
+            else:
+                # Very minimal feedback if we have nothing else
+                partial_analysis.update({
+                    "confidence_score": 5,
+                    "nervousness_indicators": "Analysis incomplete",
+                    "engagement_level": 5,
+                    "clarity_score": 5,
+                    "content_quality": "Response could not be fully analyzed",
+                    "strengths": ["Response submitted", "Interview participation"],
+                    "areas_to_improve": ["Technical analysis failed", "Consider re-recording if possible"],
+                    "overall_impression": "Unable to complete detailed analysis due to technical issues",
+                    "transcript": "Transcript extraction failed"
+                })
+        except Exception as inner_e:
+            logger.error(f"Error creating partial analysis: {str(inner_e)}")
+            # Absolute minimal response if everything fails
+            partial_analysis = {
+                "error": f"Analysis failed: {str(e)}",
+                "timestamp": datetime.datetime.now().isoformat()
+            }
+        
+        return partial_analysis
 
+# Improved version of the results function
 @app.route('/results')
 def results():
     if 'interview_id' not in session or 'analysis' not in session:
@@ -546,10 +596,14 @@ def results():
     
     # Generate overall summary with Gemini based on actual analysis
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
         # Extract transcripts for overall analysis
         transcripts = [a.get('transcript', 'No transcript available') for a in analysis]
+        
+        # Get available scores for dynamic fallback
+        available_scores = [a.get('clarity_score', 0) for a in analysis if 'clarity_score' in a]
+        avg_score = sum(available_scores) / len(available_scores) if available_scores else 70
         
         prompt = f"""
         Based on these interview question responses and analyses:
@@ -579,17 +633,100 @@ def results():
         """
         
         response = model.generate_content(prompt)
+        logger.info("Raw Gemini summary response: %s", response.text)
         
         try:
             overall_summary = json.loads(response.text)
+            
+            # Validate fields exist
+            required_summary_fields = {
+                "overall_strengths": [],
+                "improvement_areas": [],
+                "general_impression": "",
+                "interview_score": 0,
+                "hiring_recommendation": ""
+            }
+            
+            for field, default in required_summary_fields.items():
+                if field not in overall_summary:
+                    # Create dynamic defaults based on the data we have
+                    if field == "overall_strengths":
+                        # Collect strengths from individual analyses
+                        all_strengths = []
+                        for a in analysis:
+                            if 'strengths' in a and isinstance(a['strengths'], list):
+                                all_strengths.extend(a['strengths'])
+                        # Take unique strengths
+                        unique_strengths = list(set(all_strengths))[:4]
+                        overall_summary[field] = unique_strengths if unique_strengths else ["Communication skills exhibited", "Completed all interview questions"]
+                    
+                    elif field == "improvement_areas":
+                        # Collect improvement areas from individual analyses
+                        all_areas = []
+                        for a in analysis:
+                            if 'areas_to_improve' in a and isinstance(a['areas_to_improve'], list):
+                                all_areas.extend(a['areas_to_improve'])
+                        # Take unique areas
+                        unique_areas = list(set(all_areas))[:3]
+                        overall_summary[field] = unique_areas if unique_areas else ["Consider more structured responses", "Work on providing specific examples"]
+                    
+                    elif field == "general_impression":
+                        # Create from available data
+                        transcripts_word_count = sum(len(t.split()) for t in transcripts)
+                        avg_confidence = sum(a.get('confidence_score', 5) for a in analysis) / len(analysis) if analysis else 5
+                        
+                        overall_summary[field] = f"Candidate provided {transcripts_word_count} words across {len(questions)} questions with an average confidence score of {avg_confidence:.1f}/10."
+                    
+                    elif field == "interview_score":
+                        # Calculate from available scores
+                        overall_summary[field] = round(avg_score)
+                    
+                    elif field == "hiring_recommendation":
+                        # Base on calculated score
+                        score = overall_summary.get("interview_score", round(avg_score))
+                        if score >= 85:
+                            overall_summary[field] = "Strong candidate, recommend proceeding to next round"
+                        elif score >= 70:
+                            overall_summary[field] = "Consider for next round with additional screening"
+                        else:
+                            overall_summary[field] = "May need additional preparation before proceeding"
+                            
         except json.JSONDecodeError:
-            # Fallback if JSON parsing fails
+            logger.error(f"Invalid JSON in Gemini summary response: {response.text}")
+            
+            # Create a summary based on the available data
+            all_strengths = []
+            all_areas = []
+            
+            for a in analysis:
+                if 'strengths' in a and isinstance(a['strengths'], list):
+                    all_strengths.extend(a['strengths'])
+                if 'areas_to_improve' in a and isinstance(a['areas_to_improve'], list):
+                    all_areas.extend(a['areas_to_improve'])
+            
+            # Get unique items
+            unique_strengths = list(set(all_strengths))
+            unique_areas = list(set(all_areas))
+            
+            # Calculate average scores
+            clarity_scores = [a.get('clarity_score', 0) for a in analysis if 'clarity_score' in a]
+            confidence_scores = [a.get('confidence_score', 0) for a in analysis if 'confidence_score' in a]
+            
+            avg_clarity = sum(clarity_scores) / len(clarity_scores) if clarity_scores else 7
+            avg_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 7
+            
+            # Calculate overall score (70% clarity, 30% confidence)
+            calculated_score = int((avg_clarity * 0.7 + avg_confidence * 0.3) * 10)
+            
+            # Create dynamic summary
             overall_summary = {
-                "overall_strengths": ["Good communication", "Professional demeanor", "Relevant experience"],
-                "improvement_areas": ["Could provide more specific examples", "Consider more concise responses"],
-                "general_impression": "Solid candidate with good potential",
-                "interview_score": 75,
-                "hiring_recommendation": "Consider for next round"
+                "overall_strengths": unique_strengths[:4] if len(unique_strengths) >= 4 else 
+                                    unique_strengths + ["Completed interview process", "Provided responses to all questions"][:4-len(unique_strengths)],
+                "improvement_areas": unique_areas[:3] if len(unique_areas) >= 3 else
+                                    unique_areas + ["Consider more detailed responses", "Work on interview confidence"][:3-len(unique_areas)],
+                "general_impression": f"Candidate showed {avg_confidence:.1f}/10 confidence and {avg_clarity:.1f}/10 clarity across {len(questions)} interview questions.",
+                "interview_score": calculated_score,
+                "hiring_recommendation": "Consider for next round" if calculated_score >= 70 else "May need additional preparation"
             }
             
         # Save results to database
@@ -605,14 +742,40 @@ def results():
         
     except Exception as e:
         logger.error(f"Error generating summary: {str(e)}")
-        # Fallback summary
-        overall_summary = {
-            "overall_strengths": ["Good communication", "Professional demeanor", "Relevant experience"],
-            "improvement_areas": ["Could provide more specific examples", "Technical depth could be improved"],
-            "general_impression": "Solid candidate with good potential",
-            "interview_score": 72,
-            "hiring_recommendation": "Consider for next round"
-        }
+        
+        # Create dynamic summary based on available data
+        try:
+            # Extract any available data from analyses
+            strengths_lists = [a.get('strengths', []) for a in analysis if 'strengths' in a]
+            areas_lists = [a.get('areas_to_improve', []) for a in analysis if 'areas_to_improve' in a]
+            
+            # Flatten lists
+            all_strengths = [s for sublist in strengths_lists for s in sublist]
+            all_areas = [a for sublist in areas_lists for a in sublist]
+            
+            # Get unique items
+            unique_strengths = list(set(all_strengths))[:4]
+            unique_areas = list(set(all_areas))[:3]
+            
+            # Create data-driven summary
+            overall_summary = {
+                "overall_strengths": unique_strengths if unique_strengths else ["Completed interview process", "Provided responses to questions"],
+                "improvement_areas": unique_areas if unique_areas else ["Technical analysis incomplete"],
+                "general_impression": f"Analysis based on {len(analysis)} responses to {len(questions)} questions.",
+                "interview_score": int(avg_score),
+                "hiring_recommendation": "Review individual responses for more details"
+            }
+        except Exception as inner_e:
+            logger.error(f"Error creating dynamic summary: {str(inner_e)}")
+            
+            # Absolute minimal summary if all else fails
+            overall_summary = {
+                "overall_strengths": ["Interview completed", "Responses recorded"],
+                "improvement_areas": ["Technical analysis incomplete"],
+                "general_impression": "Summary generation encountered technical issues.",
+                "interview_score": 50,  # Neutral score
+                "hiring_recommendation": "Review individual responses manually"
+            }
     
     # Add video paths for replay
     for i, answer in enumerate(answers):
@@ -623,6 +786,7 @@ def results():
                           questions=questions,
                           individual_analyses=analysis,
                           overall_summary=overall_summary)
+
 
 @app.route('/download-report')
 def download_report():
