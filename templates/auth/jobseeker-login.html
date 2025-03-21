@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recruiter Login - Job Portal</title>
-    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css" />
+    <title>Login - Job Application Portal</title>
+    <link rel="stylesheet" href="/static/style/seeker-recruiter-style.css" />
   </head>
   <body>
     <div class="form-container">
-      <h2>Recruiter Login</h2>
-      <form id="loginForm" action="/jobrecruiter-login" method="POST">
+      <h2>Job Seeker Login</h2>
+      <form id="loginForm" action="/jobseeker-login" method="POST">
         <div class="form-group">
           <label for="email">Email:</label>
           <input type="email" id="email" name="email" required />
@@ -20,20 +20,19 @@
           <input type="password" id="password" name="password" required />
         </div>
 
-        <input type="hidden" name="userType" value="recruiter" />
+        <input type="hidden" name="userType" value="jobseeker" />
 
         <button type="submit" class="btn">Login</button>
       </form>
       <p class="form-footer">
-        Don't have a recruiter account?
-        <a href="/jobrecruiter-register">Register here</a>
+        Don't have an account? <a href="/">Register here</a>
       </p>
-      <p class="form-footer">
-        Are you a job seeker? <a href="/jobseeker-login">Login as job seeker</a>
+      <p class="form-footer user-type-switch">
+        Are you a recruiter?
+        <a href="/jobrecruiter-login">Login as recruiter</a>
       </p>
     </div>
     <script src="script.js"></script>
-
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // Get the form elements
@@ -94,5 +93,3 @@
     </script>
   </body>
 </html>
-
-<!--  -->

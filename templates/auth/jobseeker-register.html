@@ -3,16 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Job Application Portal</title>
-    <link rel="stylesheet" href="../static/style/seeker-recruiter-style.css" />
+    <title>Job Application Portal</title>
+    <link rel="stylesheet" href="/static/style/seeker-recruiter-style.css" />
   </head>
   <body>
     <div class="form-container">
-      <h2>Job Seeker Login</h2>
-      <form id="loginForm" action="/jobseeker-login" method="POST">
+      <h2>Job Application Form</h2>
+      <form
+        id="jobForm"
+        enctype="multipart/form-data"
+        action="/jobseeker-register"
+        method="POST"
+      >
+        <div class="form-group">
+          <label for="resume">Upload Resume (PDF):</label>
+          <input type="file" id="resume" name="resume" accept=".pdf" required />
+          <small>Upload your resume to auto-fill the form below.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="fullName">Full Name:</label>
+          <input type="text" id="fullName" name="fullName" required />
+        </div>
+
         <div class="form-group">
           <label for="email">Email:</label>
           <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number:</label>
+          <input type="tel" id="phone" name="phone" required />
+        </div>
+
+        <div class="form-group">
+          <label for="experience">Years of Experience:</label>
+          <input
+            type="number"
+            id="experience"
+            name="experience"
+            min="0"
+            max="50"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="skills">Skills:</label>
+          <textarea id="skills" name="skills" rows="3" required></textarea>
         </div>
 
         <div class="form-group">
@@ -20,16 +58,20 @@
           <input type="password" id="password" name="password" required />
         </div>
 
-        <input type="hidden" name="userType" value="jobseeker" />
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+          />
+        </div>
 
-        <button type="submit" class="btn">Login</button>
+        <button type="submit" class="btn">Submit Application</button>
       </form>
       <p class="form-footer">
-        Don't have an account? <a href="/">Register here</a>
-      </p>
-      <p class="form-footer user-type-switch">
-        Are you a recruiter?
-        <a href="/jobrecruiter-login">Login as recruiter</a>
+        Already have an account? <a href="/jobseeker-login">Login here</a>
       </p>
     </div>
     <script src="script.js"></script>

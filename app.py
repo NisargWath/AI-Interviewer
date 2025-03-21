@@ -73,7 +73,9 @@ def behavoural():
 
 
 
-
+@app.route('/resume')
+def resume():
+    return render_template('resume.html')
 
 
 
@@ -107,7 +109,7 @@ def jobseeker_register():
         # Validate passwords match
         if password != confirm_password:
             flash('Passwords do not match!')
-            return render_template('jobseeker-register.html')
+            return render_template('auth/jobrecruiter-register.html')
         
         # Check if user already exists
         existing_user = job_seekers.find_one({'email': email})
@@ -140,7 +142,7 @@ def jobseeker_register():
         flash('Registration successful! Please login.')
         return redirect(url_for('jobseeker_login'))
     
-    return render_template('jobseeker-register.html')
+    return render_template('/auth/jobseeker-register.html')
 
 @app.route('/jobseeker-login', methods=['GET', 'POST'])
 def jobseeker_login():
@@ -162,7 +164,7 @@ def jobseeker_login():
         else:
             flash('Invalid email or password')
     
-    return render_template('jobseeker-login.html')
+    return render_template('/auth/jobseeker-login.html')
 
 @app.route('/jobrecruiter-register', methods=['GET', 'POST'])
 def jobrecruiter_register():
@@ -181,7 +183,7 @@ def jobrecruiter_register():
         # Validate passwords match
         if password != confirm_password:
             flash('Passwords do not match!')
-            return render_template('jobrecruiter-register.html')
+            return render_template('/auth/jobrecruiter-register.html')
         
         # Check if recruiter already exists
         existing_recruiter = job_recruiters.find_one({'email': email})
@@ -207,7 +209,7 @@ def jobrecruiter_register():
         flash('Registration successful! Please login.')
         return redirect(url_for('jobrecruiter_login'))
     
-    return render_template('jobrecruiter-register.html')
+    return render_template('/auth/jobrecruiter-register.html')
 
 @app.route('/jobrecruiter-login', methods=['GET', 'POST'])
 def jobrecruiter_login():
@@ -229,7 +231,7 @@ def jobrecruiter_login():
         else:
             flash('Invalid email or password')
     
-    return render_template('jobrecruiter-login.html')
+    return render_template('/auth/jobrecruiter-login.html')
 
 @app.route('/logout')
 def logout():
