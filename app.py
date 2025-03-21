@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['UPLOAD_RESUME'] = 'static/uploads/Resume'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
 app.config['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')
 
@@ -44,6 +45,7 @@ genai.configure(api_key=app.config['GEMINI_API_KEY'])
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['UPLOAD_RESUME'], exist_ok=True)
 
 # Placeholder for interview questions (in production, use a database)
 QUESTION_BANK = [
@@ -61,9 +63,27 @@ QUESTION_BANK = [
 def index():
     return render_template('index.html')
 
+
+
+# Behavoural Qu
+
 @app.route('/behavoural')
 def behavoural():
     return render_template('behavoural.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -111,7 +131,7 @@ def jobseeker_register():
             resume = request.files['resume']
             if resume.filename != '':
                 filename = secure_filename(f"{email}_{resume.filename}")
-                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                filepath = os.path.join(app.config['UPLOAD_RESUME'], filename)
                 resume.save(filepath)
                 new_user['resume_path'] = filepath
         
@@ -138,7 +158,7 @@ def jobseeker_login():
             session['user_type'] = 'jobseeker'
             session['user_name'] = user['fullName']
             flash('Login successful!')
-            return redirect(url_for('behavoural'))
+            return redirect(url_for('user_dashboard'))
         else:
             flash('Invalid email or password')
     
@@ -228,6 +248,19 @@ def phase1():
         return redirect(url_for('jobseeker_login'))
     
     return render_template("phase1.html")
+
+@app.route('/user-dashboard')
+def user_dashboard():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        flash('Please log in to access the dashboard')
+        return redirect(url_for('index'))
+    
+    # Get user information from session
+    user_type = session.get('user_type')
+    user_name = session.get('user_name')
+    
+    return render_template('jobseekerDash.html', user_name=user_name, user_type=user_type)
 
 @app.route('/start-interview', methods=['POST'])
 def start_interview():
