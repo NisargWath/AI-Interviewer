@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-0">Applications for: {{ job.title }}</h3>
+                <p class="mb-0">{{ job.company }}</p>
+            </div>
+            <a href="{{ url_for('view_jobs_candidate') }}" class="btn btn-outline-light">Back to Jobs</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Contact Information</th>
+                            <th>Experience</th>
+                            <th>Applied On</th>
+                            <th>Resume</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>{{ app.name }}</td>
+                            <td>
+                                <div>Email: {{ app.email }}</div>
+                                <div>Phone: {{ app.phone }}</div>
+                            </td>
+                            <td>{{ app.experience }} years</td>
+                            <td>{{ app.date_applied.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <a href="{{ url_for('download_resume_candidate', filename=app.resume_path) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#applicationModal{{ app._id }}">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Application Details Modal -->
+                        <div class="modal fade" id="applicationModal{{ app._id }}" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Application from {{ app.name }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Email:</strong> {{ app.email }}</p>
+                                                <p><strong>Phone:</strong> {{ app.phone }}</p>
+                                                <p><strong>Experience:</strong> {{ app.experience }} years</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Applied On:</strong> {{ app.date_applied.strftime('%Y-%m-%d %H:%M') }}</p>
+                                                <p>
+                                                    <strong>Resume:</strong> 
+                                                    <a href="{{ url_for('download_resume_candidate', filename=app.resume_path) }}" class="btn btn-sm btn-info ml-2">
+                                                        <i class="fas fa-download"></i> Download
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <h6>Cover Letter:</h6>
+                                            <div class="p-3 bg-light">
+                                                {{ app.cover_letter|nl2br }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if applications.count() == 0 %}
+            <div class="alert alert-info">
+                No applications have been submitted for this job yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3>Apply for: {{ job.title }}</h3>
+            <h5>{{ job.company }} - {{ job.location }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="job-details mb-4">
+                <h5>Job Details</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Salary:</strong> {{ job.salary }}</p>
+                        <p><strong>Posted:</strong> {{ job.date_posted.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Contact:</strong> {{ job.contact_email }}</p>
+                    </div>
+                </div>
+                <p><strong>Description:</strong> {{ job.description }}</p>
+                <p><strong>Requirements:</strong> {{ job.requirements }}</p>
+            </div>
+            
+            <hr>
+            
+            <h5>Submit Your Application</h5>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="phone">Phone Number <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="experience">Years of Experience <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="experience" name="experience" min="0" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cover_letter">Cover Letter <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="cover_letter" name="cover_letter" rows="5" required 
+                              placeholder="Explain why you're interested in this position and what makes you a good fit..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resume">Upload Resume (PDF) <span class="text-danger">*</span></label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                        <label class="custom-file-label" for="resume">Choose file</label>
+                    </div>
+                    <small class="form-text text-muted">Accepted formats: PDF, DOC, DOCX. Maximum size: 16MB</small>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                    <a href="{{ url_for('view_jobs_candidate') }}" class="btn btn-outline-secondary ml-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Script to show the name of the uploaded file -->
+<script>
+document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+    var fileName = e.target.files[0].name;
+    var nextSibling = e.target.nextElementSibling;
+    nextSibling.innerText = fileName;
+})
+</script>
+{% endblock %}

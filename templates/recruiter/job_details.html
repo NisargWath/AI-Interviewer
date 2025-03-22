@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ job.title }} - Job Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/jobs">Job Listings</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Job Details</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h1 class="card-title h3">{{ job.title }}</h1>
+                <h6 class="card-subtitle">{{ job.company }} - {{ job.location }}</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        {% if job.salary %}
+                            <p><strong>Salary Range:</strong> {{ job.salary }}</p>
+                        {% endif %}
+                        <p><strong>Posted:</strong> {{ job.date_posted.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="mailto:{{ job.contact_email }}" class="btn btn-outline-primary">
+                            Contact Employer
+                        </a>
+                    </div>
+                </div>
+                
+                <h3 class="h4 mb-3">Job Description</h3>
+                <div class="mb-4">
+                    {{ job.description }}
+                </div>
+                
+                <h3 class="h4 mb-3">Requirements</h3>
+                <div class="mb-4">
+                    {{ job.requirements }}
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/jobs" class="btn btn-secondary">Back to Listings</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

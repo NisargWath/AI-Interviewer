@@ -17,6 +17,11 @@ import logging
 import base64
 from moviepy import VideoFileClip
 import speech_recognition as sr
+from datetime import datetime
+from bson.objectid import ObjectId
+
+
+
 
 # Load environment variables
 load_dotenv()
@@ -39,7 +44,11 @@ mongo = PyMongo(app)
 # Define database collections
 job_seekers = mongo.db.jobseekers
 job_recruiters = mongo.db.recruiters
+db = mongo.db.job_board
+jobs_collection = mongo.db.job_postings
+applications_collection = mongo.db.applications
 
+jobs_collection = mongo.db.job_postings
 # Initialize Gemini API
 genai.configure(api_key=app.config['GEMINI_API_KEY'])
 
@@ -78,18 +87,127 @@ def resume():
     return render_template('resume.html')
 
 
+# #### Recruiter DashBoard
+@app.route('/create_job', methods=['GET', 'POST'])
+def create_job():
+    if request.method == 'POST':
+        # Get form data
+        job_posting = {
+            'title': request.form.get('title'),
+            'company': request.form.get('company'),
+            'location': request.form.get('location'),
+            'salary': request.form.get('salary'),
+            'description': request.form.get('description'),
+            'requirements': request.form.get('requirements'),
+            'contact_email': request.form.get('contact_email'),
+            'date_posted': datetime.now(),
+            'is_active': True  # Set active by default
+        }
+        
+        # Insert job posting to MongoDB
+        try:
+            jobs_collection.insert_one(job_posting)
+            flash('Job posting created successfully!', 'success')
+            return redirect(url_for('view_jobs'))
+        except Exception as e:
+            flash(f'Error creating job posting: {str(e)}', 'danger')
+    
+    # GET request - serve the job creation form
+    return render_template('/recruiter/create_job.html')
 
+@app.route('//view_jobs')
+def view_jobs():
+    # Fetch all job postings from MongoDB, sorted by date (newest first)
+    jobs = list(jobs_collection.find().sort('date_posted', -1))
+    
+    # Convert ObjectId to string for each job
+    for job in jobs:
+        job['_id'] = str(job['_id'])
+    
+    return render_template('/recruiter/view_jobs.html', jobs=jobs)
 
+@app.route('/job/<job_id>')
+def job_details(job_id):
+    # Fetch specific job by ID
+    try:
+        job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+        if job:
+            job['_id'] = str(job['_id'])
+            return render_template('job_details.html', job=job)
+        else:
+            flash('Job not found', 'danger')
+            return redirect(url_for('view_jobs'))
+    except:
+        flash('Invalid job ID', 'danger')
+        return redirect(url_for('view_jobs'))
 
+@app.route('/edit_job/<job_id>', methods=['GET', 'POST'])
+def edit_job(job_id):
+    try:
+        if request.method == 'POST':
+            # Update job posting in MongoDB
+            updated_job = {
+                'title': request.form.get('title'),
+                'company': request.form.get('company'),
+                'location': request.form.get('location'),
+                'salary': request.form.get('salary'),
+                'description': request.form.get('description'),
+                'requirements': request.form.get('requirements'),
+                'contact_email': request.form.get('contact_email'),
+                'last_updated': datetime.now()
+                # Don't update date_posted or is_active here
+            }
+            
+            jobs_collection.update_one(
+                {'_id': ObjectId(job_id)},
+                {'$set': updated_job}
+            )
+            
+            flash('Job posting updated successfully!', 'success')
+            return redirect(url_for('job_details', job_id=job_id))
+        
+        # GET request - serve the job edit form with pre-filled data
+        job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+        if job:
+            job['_id'] = str(job['_id'])
+            return render_template('edit_job.html', job=job)
+        else:
+            flash('Job not found', 'danger')
+            return redirect(url_for('view_jobs'))
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'danger')
+        return redirect(url_for('view_jobs'))
 
-
-
+@app.route('/toggle_job_status/<job_id>')
+def toggle_job_status(job_id):
+    try:
+        # Get current job
+        job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+        if job:
+            # Toggle the active status
+            current_status = job.get('is_active', True)
+            new_status = not current_status
+            
+            jobs_collection.update_one(
+                {'_id': ObjectId(job_id)},
+                {'$set': {'is_active': new_status, 'status_updated': datetime.now()}}
+            )
+            
+            status_msg = "activated" if new_status else "deactivated"
+            flash(f'Job posting {status_msg} successfully!', 'success')
+        else:
+            flash('Job not found', 'danger')
+            
+        return redirect(url_for('job_details', job_id=job_id))
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'danger')
+        return redirect(url_for('view_jobs'))
 
 
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('/recruiter/dashboard.html')
 
 ############################
 # Login and Registration Routes for Job Seekers and Recruiters
@@ -238,6 +356,75 @@ def logout():
     session.clear()
     flash('You have been logged out.')
     return redirect(url_for('index'))
+
+
+
+@app.route('/view_jobs_candidate', methods=['GET'])
+def view_jobs_candidate():
+    # Convert cursor to a list so it can be used in the template
+    jobs_list = list(jobs_collection.find().sort('date_posted', -1))
+    
+    # Convert ObjectId to string for each job (as you do in other routes)
+    for job in jobs_list:
+        job['_id'] = str(job['_id'])
+    
+    return render_template('view_jobs_candidate.html', jobs=jobs_list)
+
+# Applying for a specific job
+@app.route('/apply_job_candidate/<job_id>', methods=['GET', 'POST'])
+def apply_job_candidate(job_id):
+    job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+    
+    if request.method == 'POST':
+        # Get form data
+        application = {
+            'job_id': job_id,
+            'name': request.form.get('name'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone'),
+            'experience': request.form.get('experience'),
+            'cover_letter': request.form.get('cover_letter'),
+            'date_applied': datetime.now()
+        }
+        
+        # Handle resume upload
+        if 'resume' in request.files:
+            resume = request.files['resume']
+            if resume.filename != '':
+                # Generate a secure filename
+                filename = secure_filename(resume.filename)
+                # Create a unique filename with timestamp
+                unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
+                # Save the file
+                resume_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                resume.save(resume_path)
+                # Add file path to application data
+                application['resume_path'] = unique_filename
+        
+        try:
+            applications_collection.insert_one(application)
+            flash('Application submitted successfully!', 'success')
+            return redirect(url_for('view_jobs_candidate'))
+        except Exception as e:
+            flash(f'Error submitting application: {str(e)}', 'danger')
+    
+    return render_template('apply_job_candidate.html', job=job)
+
+# Viewing applications for a specific job
+@app.route('/view_applications_candidate/<job_id>', methods=['GET'])
+def view_applications_candidate(job_id):
+    # Fetch the job posting
+    job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+    # Fetch all applications for this job
+    applications = applications_collection.find({'job_id': job_id})
+    
+    return render_template('view_applications_candidate.html', job=job, applications=applications)
+
+# Downloading resume files
+@app.route('/download_resume_candidate/<filename>', methods=['GET'])
+def download_resume_candidate(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
 
 ########################################
 # Interview Process Routes
@@ -840,4 +1027,4 @@ def download_report():
     return jsonify(report_data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Job Posting</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Create Job Posting</h1>
+        <form action="/create_job" method="POST">
+            <div class="mb-3">
+                <label for="title" class="form-label">Job Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="company" class="form-label">Company</label>
+                <input type="text" class="form-control" id="company" name="company" required>
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <div class="mb-3">
+                <label for="salary" class="form-label">Salary Range</label>
+                <input type="text" class="form-control" id="salary" name="salary">
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Job Description</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="requirements" class="form-label">Requirements</label>
+                <textarea class="form-control" id="requirements" name="requirements" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="contact_email" class="form-label">Contact Email</label>
+                <input type="email" class="form-control" id="contact_email" name="contact_email" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Job Posting</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

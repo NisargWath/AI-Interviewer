@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Available Job Opportunities</h2>
+    
+    <div class="row">
+        {% for job in jobs %}
+        <div class="col-md-4 mb-4">
+            <div class="card job-card">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ job.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ job.company }}</h6>
+                    <div class="card-text mb-3">
+                        <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ job.location }}</p>
+                        <p><i class="fas fa-dollar-sign"></i> <strong>Salary:</strong> {{ job.salary }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> <strong>Posted:</strong> {{ job.date_posted.strftime('%Y-%m-%d') }}</p>
+                        <div class="description-preview">
+                            {{ job.description[:100] }}{% if job.description|length > 100 %}...{% endif %}
+                        </div>
+                    </div>
+                    <div class="mt-auto">
+                        <button type="button" class="btn btn-info mr-2" data-toggle="modal" data-target="#jobModal{{ job._id }}">
+                            View Details
+                        </button>
+                        <a href="{{ url_for('apply_job_candidate', job_id=job._id) }}" class="btn btn-primary">Apply Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Details Modal -->
+        <div class="modal fade" id="jobModal{{ job._id }}" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ job.title }} - {{ job.company }}</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Location:</strong> {{ job.location }}</p>
+                                <p><strong>Salary:</strong> {{ job.salary }}</p>
+                                <p><strong>Posted:</strong> {{ job.date_posted.strftime('%Y-%m-%d') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Contact:</strong> {{ job.contact_email }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Description:</h6>
+                            <p>{{ job.description }}</p>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Requirements:</h6>
+                            <p>{{ job.requirements }}</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <a href="{{ url_for('apply_job_candidate', job_id=job._id) }}" class="btn btn-primary">Apply Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if jobs|length == 0 %}
+
+    <div class="alert alert-info">
+        No job postings are available at this time. Please check back later.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
