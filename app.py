@@ -17,6 +17,10 @@ import logging
 import base64
 from moviepy import VideoFileClip
 import speech_recognition as sr
+from datetime import datetime
+
+
+
 
 # Load environment variables
 load_dotenv()
@@ -39,6 +43,10 @@ mongo = PyMongo(app)
 # Define database collections
 job_seekers = mongo.db.jobseekers
 job_recruiters = mongo.db.recruiters
+db = mongo.db.job_board
+jobs_collection = mongo.db.job_postings
+applications_collection = mongo.db.applications
+
 
 # Initialize Gemini API
 genai.configure(api_key=app.config['GEMINI_API_KEY'])
@@ -76,11 +84,6 @@ def behavoural():
 @app.route('/resume')
 def resume():
     return render_template('resume.html')
-
-
-
-
-
 
 
 
@@ -238,6 +241,71 @@ def logout():
     session.clear()
     flash('You have been logged out.')
     return redirect(url_for('index'))
+
+
+
+# Viewing job listings for candidates
+@app.route('/view_jobs_candidate', methods=['GET'])
+def view_jobs_candidate():
+    # Fetch all job postings from the database
+    jobs = jobs_collection.find().sort('date_posted', -1)
+    return render_template('view_jobs_candidate.html', jobs=jobs)
+
+# Applying for a specific job
+@app.route('/apply_job_candidate/<job_id>', methods=['GET', 'POST'])
+def apply_job_candidate(job_id):
+    job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+    
+    if request.method == 'POST':
+        # Get form data
+        application = {
+            'job_id': job_id,
+            'name': request.form.get('name'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone'),
+            'experience': request.form.get('experience'),
+            'cover_letter': request.form.get('cover_letter'),
+            'date_applied': datetime.now()
+        }
+        
+        # Handle resume upload
+        if 'resume' in request.files:
+            resume = request.files['resume']
+            if resume.filename != '':
+                # Generate a secure filename
+                filename = secure_filename(resume.filename)
+                # Create a unique filename with timestamp
+                unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
+                # Save the file
+                resume_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                resume.save(resume_path)
+                # Add file path to application data
+                application['resume_path'] = unique_filename
+        
+        try:
+            applications_collection.insert_one(application)
+            flash('Application submitted successfully!', 'success')
+            return redirect(url_for('view_jobs_candidate'))
+        except Exception as e:
+            flash(f'Error submitting application: {str(e)}', 'danger')
+    
+    return render_template('apply_job_candidate.html', job=job)
+
+# Viewing applications for a specific job
+@app.route('/view_applications_candidate/<job_id>', methods=['GET'])
+def view_applications_candidate(job_id):
+    # Fetch the job posting
+    job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+    # Fetch all applications for this job
+    applications = applications_collection.find({'job_id': job_id})
+    
+    return render_template('view_applications_candidate.html', job=job, applications=applications)
+
+# Downloading resume files
+@app.route('/download_resume_candidate/<filename>', methods=['GET'])
+def download_resume_candidate(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
 
 ########################################
 # Interview Process Routes
