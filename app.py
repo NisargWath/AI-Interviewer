@@ -91,7 +91,49 @@ def resume():
     return render_template('resume.html')
 
 
+
+
+
+
+
+
 # #### Recruiter DashBoard
+
+
+
+
+@app.route('/viewCandidate')
+def viewCandidate():
+    return render_template('viewCandidate.html')
+
+
+@app.route('/get_candidate_data/<application_id>', methods=['GET'])
+def get_candidate_data(application_id):
+    try:
+        # Fetch application data from the database
+        application = applications_collection.find_one({'_id': ObjectId(application_id)})
+        
+        if not application:
+            return jsonify({'error': 'Application not found'}), 404
+        
+        # Convert ObjectId to string for JSON serialization
+        application['_id'] = str(application['_id'])
+        
+        # Fetch additional data if needed (like resume content)
+        # You might need to handle resume file processing here
+        
+        return jsonify(application)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
+
+
+
 @app.route('/create_job', methods=['GET', 'POST'])
 def create_job():
     if request.method == 'POST':
@@ -418,7 +460,7 @@ def jobrecruiter_register():
             'companySize': company_size,
             'companyLocation': company_location,
             'password': generate_password_hash(password),
-            'created_at': datetime.datetime.now()
+            'created_at': datetime.now()
         }
         
         # Insert recruiter into database
@@ -455,6 +497,11 @@ def logout():
     session.clear()
     flash('You have been logged out.')
     return redirect(url_for('index'))
+
+
+
+
+
 
 
 
@@ -724,6 +771,111 @@ def apply_job_candidate(job_id):
 
 
 
+@app.route('/sendEmails', methods=['GET'])
+def sendEmails():
+    """
+    Handle the request when the 'Proceed' button is clicked and send 
+    notification email about next round selection
+    
+    Returns:
+        Redirect to dashboard with appropriate flash message
+    """
+    try:
+        # The email address that should receive the notification
+        recipient_email = "nisargwath7@gmail.com"
+        
+        # Get candidate info (in a real app, this would come from the session or previous form)
+        # For demonstration, using placeholder values
+        candidate_name = request.args.get('name', 'Candidate')
+        job_title = request.args.get('job_title', 'Applied Position')
+        company_name = request.args.get('company', 'Company')
+        
+        # Send the email notification
+        email_sent = send_next_round_email(recipient_email, candidate_name, job_title, company_name)
+        
+        if email_sent:
+            flash('Candidate has been notified about the next round!', 'success')
+        else:
+            flash('Failed to send email notification. Please try again later.', 'danger')
+            
+        # Redirect to the employer dashboard or another appropriate page
+        return redirect(url_for('user_dashboard'))
+    
+    except Exception as e:
+        flash(f'An error occurred: {str(e)}', 'danger')
+        return redirect(url_for('user_dashboard'))
+
+def send_next_round_email(recipient_email, candidate_name, job_title, company_name):
+    """
+    Send email notification about selection for the next round (Onsite/OE)
+    
+    Args:
+        recipient_email (str): Email address of the recipient
+        candidate_name (str): Name of the candidate
+        job_title (str): Title of the job position
+        company_name (str): Name of the company
+    
+    Returns:
+        bool: True if email was sent successfully, False otherwise
+    """
+    subject = f"Congratulations! You're Selected for the Next Round - {job_title}"
+    
+    # Generate HTML email content
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Next Round Selection</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }}
+            .header {{ background-color: #4a86e8; color: white; padding: 15px; text-align: center; border-radius: 5px 5px 0 0; margin: -20px -20px 20px; }}
+            .selection-details {{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+            .footer {{ text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }}
+            .cta-button {{ display: inline-block; background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-top: 15px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>Congratulations!</h2>
+            </div>
+            
+            <p>Dear {candidate_name},</p>
+            
+            <p>We are pleased to inform you that you have been <strong>selected for the next round</strong> of the interview process for the <strong>{job_title}</strong> position at <strong>{company_name}</strong>.</p>
+            
+            <div class="selection-details">
+                <h3>Next Round Details:</h3>
+                <p><strong>Round Type:</strong> Onsite/OE (On-site Evaluation)</p>
+                <p><strong>What to Expect:</strong> This round will focus on evaluating your technical skills and cultural fit within our organization.</p>
+                <p><strong>Date:</strong> Our HR team will contact you shortly to schedule at your convenience.</p>
+            </div>
+            
+            <p>We were impressed with your profile and performance in the previous round, and we look forward to learning more about you in this next phase.</p>
+            
+            <p>To confirm your participation and select your preferred time slots, please click the button below:</p>
+            <div style="text-align: center;">
+                <a href="#" class="cta-button">Schedule Interview</a>
+            </div>
+            
+            <p>If you have any questions or need any accommodations, please don't hesitate to contact our recruitment team.</p>
+            
+            <p>Best regards,<br>
+            The Recruitment Team<br>
+            {company_name}</p>
+            
+            <div class="footer">
+                <p>This email was sent by IntervoAI Recruitment System.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return send_email(recipient_email, subject, html_content, is_html=True)
 
 
 
@@ -731,15 +883,29 @@ def apply_job_candidate(job_id):
 
 
 
-# Viewing applications for a specific job
+
+
+
+def nl2br(value):
+    """Converts newlines to <br> tags for HTML rendering."""
+    return value.replace("\n", "<br>\n")
+
+# Register the custom filter with Jinja2
+app.jinja_env.filters['nl2br'] = nl2br
+
+
+
+
+
 @app.route('/view_applications_candidate/<job_id>', methods=['GET'])
 def view_applications_candidate(job_id):
-    # Fetch the job posting
-    job = jobs_collection.find_one({'_id': ObjectId(job_id)})
-    # Fetch all applications for this job
-    applications = applications_collection.find({'job_id': job_id})
-    
-    return render_template('view_applications_candidate.html', job=job, applications=applications)
+    try:
+        job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+        applications = list(applications_collection.find({'job_id': ObjectId(job_id)}))  # Convert to list
+        
+        return render_template('view_application_candidate.html', job=job, recent_applications=applications)
+    except Exception as e:
+        return str(e), 400  # Handle errors gracefully
 
 @app.route('/download_resume_candidate/<filename>', methods=['GET'])
 def download_resume_candidate(filename):
@@ -817,7 +983,7 @@ def start_interview():
             'position': position,
             'experience': experience,
             'questions': questions,
-            'started_at': datetime.datetime.now()
+            'started_at': datetime.now()
         }
         mongo.db.interviews.insert_one(interview_data)
         
@@ -879,7 +1045,7 @@ def submit_answer():
             'question': session['questions'][session['current_question']],
             'video_path': filepath,
             'analysis': analysis,
-            'submitted_at': datetime.datetime.now()
+            'submitted_at': datetime.now()
         }
         mongo.db.interview_answers.insert_one(answer_data)
         
@@ -1063,7 +1229,7 @@ def analyze_video(video_path, question):
             analysis = {
                 **facial_analysis,  # Include facial analysis results
                 "clarity_score": facial_analysis['confidence_score'],  # Base clarity on confidence
-                "content_quality": f"Response to '{question[:50]}...' appears to include relevant content",
+                "content_quality": f"Response to '{question[:74]}...' appears to include relevant content",
                 "strengths": [
                     f"Attempted to address the question about {question.split()[0:3]}...",
                     "Provided verbal response",
@@ -1101,7 +1267,7 @@ def analyze_video(video_path, question):
                     "confidence_score": partial_analysis.get("confidence_score", 5),
                     "engagement_level": partial_analysis.get("engagement_level", 5),
                     "clarity_score": 5,  # Neutral score
-                    "content_quality": f"Partial analysis based on transcript: '{partial_transcript[:50]}...'",
+                    "content_quality": f"Partial analysis based on transcript: '{partial_transcript[:70]}...'",
                     "strengths": ["Response provided", "Attempted to address question"],
                     "areas_to_improve": ["Technical analysis incomplete", "Consider re-recording"],
                     "overall_impression": "Analysis incomplete due to technical issues"
@@ -1124,7 +1290,7 @@ def analyze_video(video_path, question):
             # Absolute minimal response if everything fails
             partial_analysis = {
                 "error": f"Analysis failed: {str(e)}",
-                "timestamp": datetime.datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat()
             }
         
         return partial_analysis
@@ -1281,7 +1447,7 @@ def results():
             'questions': questions,
             'analysis': analysis,
             'overall_summary': overall_summary,
-            'completed_at': datetime.datetime.now()
+            'completed_at': datetime.now()
         }
         mongo.db.interview_results.insert_one(results_data)
         
@@ -1342,7 +1508,7 @@ def download_report():
     # For now, just return the analysis as JSON
     report_data = {
         'interview_id': session['interview_id'],
-        'timestamp': datetime.datetime.now().isoformat(),
+        'timestamp': datetime.now().isoformat(),
         'questions': session.get('questions', []),
         'analysis': session.get('analysis', [])
     }

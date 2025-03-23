@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Preferences | Learning Pathways</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+
+    <link
+      href="/static/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="/static/css/fontawesome.css" />
+    <link rel="stylesheet" href="/static/css/templatemo-grad-school.css" />
+    <link rel="stylesheet" href="/static/css/owl.css" />
+    <link rel="stylesheet" href="/static/css/lightbox.css" />
+
+    <header class="main-header clearfix custom-bg" role="header">
+      <div class="logo">
+        <a href="http://127.0.0.1:7000/">
+          <a href="http://127.0.0.1:7000/"><em>Acad</em>Ease</a>
+        </a>
+      </div>
+
+      <a href="/" class="menu-link"><i class="fa fa-bars"></i></a>
+      <nav id="menu" class="main-nav" role="navigation">
+        <ul class="main-menu">
+          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/preferences">Preferences</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <style>
+      body {
+        padding-top: 80px; /* Adjust according to navbar height */
+      }
+      .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+      }
+      .form-label {
+        font-weight: 500;
+      }
+      .section-title {
+        color: #0d6efd;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+      }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow">
+                    <div class="card-header bg-light">
+                        <h3 class="mb-0">Learning Preferences Assessment</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">This comprehensive assessment helps us understand your unique learning style and preferences, enabling us to create personalized learning pathways that align with how you learn best.</p>
+                        
+                        <form id="preferencesForm">
+                            <!-- Basic Learning Style Section -->
+                            <h4 class="section-title">Core Learning Style</h4>
+                            <div class="mb-4">
+                                <label for="learning_style" class="form-label">Your Primary Learning Style</label>
+                                <select class="form-select" id="learning_style" name="learning_style" required>
+                                    <option value="" disabled selected>Select your preferred learning style</option>
+                                    <option value="Visual" {% if preferences and preferences[0] == 'Visual' %}selected{% endif %}>Visual (learn through images, diagrams, videos)</option>
+                                    <option value="Auditory" {% if preferences and preferences[0] == 'Auditory' %}selected{% endif %}>Auditory (learn through listening, discussions)</option>
+                                    <option value="Reading/Writing" {% if preferences and preferences[0] == 'Reading/Writing' %}selected{% endif %}>Reading/Writing (learn through text, notes)</option>
+                                    <option value="Kinesthetic" {% if preferences and preferences[0] == 'Kinesthetic' %}selected{% endif %}>Kinesthetic (learn through practice, hands-on)</option>
+                                    <option value="Multimodal" {% if preferences and preferences[0] == 'Multimodal' %}selected{% endif %}>Multimodal (combination of styles)</option>
+                                </select>
+                                <div class="form-text mt-2">
+                                    <i class="fas fa-info-circle"></i> This helps us tailor learning pathways to how you learn best.
+                                </div>
+                            </div>
+
+                            <!-- Cognitive Processing Section -->
+                            <h4 class="section-title">Cognitive Processing</h4>
+                            <div class="mb-4">
+                                <label class="form-label">How do you prefer to process information?</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="processing_style" id="processing_sequential" value="Sequential" required>
+                                    <label class="form-check-label" for="processing_sequential">
+                                        <strong>Sequential:</strong> I prefer to learn in a step-by-step, logical order
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="processing_style" id="processing_holistic" value="Holistic">
+                                    <label class="form-check-label" for="processing_holistic">
+                                        <strong>Holistic:</strong> I prefer to see the big picture first, then dive into details
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Learning Environment Section -->
+                            <h4 class="section-title">Learning Environment</h4>
+                            <div class="mb-4">
+                                <label class="form-label">What type of learning environment helps you focus best?</label>
+                                <select class="form-select" id="learning_environment" name="learning_environment" required>
+                                    <option value="" disabled selected>Select your ideal learning environment</option>
+                                    <option value="Quiet">Quiet, minimal distractions</option>
+                                    <option value="Background">Background noise or music</option>
+                                    <option value="Collaborative">Social, collaborative spaces</option>
+                                    <option value="Outdoor">Natural or outdoor settings</option>
+                                    <option value="Varied">Varied environments (I need change)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Surrounding Knowledge Section -->
+                            <h4 class="section-title">Surrounding Knowledge</h4>
+                            <div class="mb-4">
+                                <label class="form-label">How do you relate new information to what you already know?</label>
+                                <select class="form-select" id="surrounding_knowledge" name="surrounding_knowledge" required>
+                                    <option value="" disabled selected>Select your approach</option>
+                                    <option value="Connector">I actively look for connections between new concepts and what I already know</option>
+                                    <option value="Compartmentalizer">I prefer to keep subjects separate and focus on mastering each topic individually</option>
+                                    <option value="Contextualizer">I learn best when I understand the real-world context or application of the information</option>
+                                    <option value="Scaffolder">I build on existing knowledge, gradually extending my understanding</option>
+                                </select>
+                                <div class="form-text mt-2">
+                                    <i class="fas fa-info-circle"></i> "Surrounding knowledge" refers to how you connect new information to existing knowledge.
+                                </div>
+                            </div>
+                            
+                            <!-- Motivation and Engagement Section -->
+                            <h4 class="section-title">Motivation and Engagement</h4>
+                            <div class="mb-4">
+                                <label class="form-label">What motivates you most in learning?</label>
+                                <select class="form-select" id="motivation_type" name="motivation_type" required>
+                                    <option value="" disabled selected>Select your primary motivation</option>
+                                    <option value="Curiosity">Curiosity and personal interest</option>
+                                    <option value="Achievement">Achievement and success</option>
+                                    <option value="Application">Practical application of knowledge</option>
+                                    <option value="Social">Social interaction and collaboration</option>
+                                    <option value="External">External rewards or recognition</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Retrieval and Practice Section -->
+                            <h4 class="section-title">Retrieval and Practice</h4>
+                            <div class="mb-4">
+                                <label class="form-label">How do you prefer to reinforce what you've learned?</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="retrieval_methods[]" id="method_quiz" value="Quiz">
+                                    <label class="form-check-label" for="method_quiz">Quizzes and tests</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="retrieval_methods[]" id="method_teach" value="Teach">
+                                    <label class="form-check-label" for="method_teach">Teaching others</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="retrieval_methods[]" id="method_practice" value="Practice">
+                                    <label class="form-check-label" for="method_practice">Practical application</label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="retrieval_methods[]" id="method_notes" value="Notes">
+                                    <label class="form-check-label" for="method_notes">Summarizing or note-taking</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="retrieval_methods[]" id="method_discussion" value="Discussion">
+                                    <label class="form-check-label" for="method_discussion">Discussion and debate</label>
+                                </div>
+                            </div>
+                            
+                            <!-- Time Management Section -->
+                            <h4 class="section-title">Time Management</h4>
+                            <div class="mb-4">
+                                <label for="preferred_study_time" class="form-label">Available Study Time (hours per week)</label>
+                                <input type="number" class="form-control" id="preferred_study_time" name="preferred_study_time" min="1" max="50" value="{{ preferences[1] if preferences else '' }}" required>
+                                <div class="form-text mt-2">
+                                    <i class="fas fa-clock"></i> We'll adjust the pace of learning pathways based on your available time.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">What is your preferred study pattern?</label>
+                                <select class="form-select" id="study_pattern" name="study_pattern" required>
+                                    <option value="" disabled selected>Select your study pattern</option>
+                                    <option value="Concentrated">Concentrated (longer, less frequent sessions)</option>
+                                    <option value="Distributed">Distributed (shorter, more frequent sessions)</option>
+                                    <option value="Mixed">Mixed (combination depending on the subject)</option>
+                                    <option value="Flexible">Flexible (varies based on my schedule)</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Feedback and Assessment Section -->
+                            <h4 class="section-title">Feedback and Assessment</h4>
+                            <div class="mb-4">
+                                <label class="form-label">How do you prefer to receive feedback on your learning?</label>
+                                <select class="form-select" id="feedback_preference" name="feedback_preference" required>
+                                    <option value="" disabled selected>Select your feedback preference</option>
+                                    <option value="Immediate">Immediate feedback</option>
+                                    <option value="Detailed">Detailed written feedback</option>
+                                    <option value="Visual">Visual feedback (charts, diagrams)</option>
+                                    <option value="Discussion">Discussion-based feedback</option>
+                                    <option value="Self">Self-assessment opportunities</option>
+                                </select>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">Save Preferences</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Learning Pathways. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('preferencesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('/preferences', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+                    alertDiv.innerHTML = `
+                        ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.querySelector('.card-body').prepend(alertDiv);
+                    
+                    // Redirect to dashboard after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    // Show error message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+                    alertDiv.innerHTML = `
+                        ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.querySelector('.card-body').prepend(alertDiv);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning Pathway</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+
+    <link
+      href="/static/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="/static/css/fontawesome.css" />
+    <link rel="stylesheet" href="/static/css/templatemo-grad-school.css" />
+    <link rel="stylesheet" href="/static/css/owl.css" />
+    <link rel="stylesheet" href="/static/css/lightbox.css" />
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        position: relative;
+        min-height: 100vh;
+      }
+      .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .chat-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #050402;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+      }
+      .chat-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 380px;
+        height: 100%;
+        background-color: white;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      .chat-sidebar.open {
+        right: 0;
+      }
+      .chat-header {
+        padding: 15px;
+        background-color: #000000;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .close-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .chat-history {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+      }
+      .input-container {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+      }
+      .input-field {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .send-button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        background-color: #000000;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .user-message {
+        background-color: #e6f7ff;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        align-self: flex-end;
+        word-wrap: break-word;
+      }
+      .bot-message {
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        align-self: flex-start;
+        word-wrap: break-word;
+      }
+      .message-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .user-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+      }
+      .bot-container {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 10px;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 900;
+      }
+      .overlay.visible {
+        display: block;
+      }
+    </style>
+  <header>
+    <nav class="navbar px-3" style="background-color: #ffffff;">
+        <div class="container-fluid d-flex align-items-center">
+            <a href="/" class="logo" style="text-decoration: none; font-size: 24px; font-weight: bold; color: #000;">
+                <span class="logo-icon" style="font-size: 28px;">⏳</span>
+                <span style="padding: 5px 10px; border-radius: 5px;">IntervoAI</span>
+            </a>
+            <a href="javascript:history.back()" class="btn btn-dark btn-sm me-3" style="font-size: 18px; font-weight: bold; color: #fff;">
+              Back
+            </a>
+        </div>
+    </nav>
+</header>
+  </head>
+  <body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-md-8">
+          <h1 id="topic-title">{{ pathway.topic }}</h1>
+          <div class="progress mb-3">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              style="width: 0%"
+              id="overall-progress"
+            ></div>
+          </div>
+
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Overview</h5>
+              <p class="card-text">{{ pathway.overview }}</p>
+              <div class="d-flex justify-content-between">
+                <span
+                  ><strong>Estimated Completion:</strong> {{
+                  pathway.estimated_completion_time }}</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div id="modules-container">
+            {% for module in pathway.modules %}
+            <div class="card module-card" id="module-{{ module.id }}">
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+              >
+                <h5 class="mb-0">{{ module.title }}</h5>
+                <span class="badge bg-primary"
+                  >{{ module.estimated_time }}</span
+                >
+              </div>
+              <div class="card-body">
+                <p>{{ module.description }}</p>
+
+                {% if module.resources|length > 0 %}
+                <h6 class="mt-3">Resources</h6>
+                {% for resource in module.resources %}
+                <div
+                  class="resource-item"
+                  id="{{ module.id }}-resource-{{ loop.index }}"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <strong>{{ resource.title }}</strong> ({{ resource.type
+                      }}, {{ resource.estimated_time }})
+                      <p class="mb-0 small">{{ resource.description }}</p>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input progress-check"
+                        type="checkbox"
+                        data-step-id="{{ module.id }}-resource-{{ loop.index }}"
+                      />
+                    </div>
+                  </div>
+                  <div class="feedback-box">
+                    <textarea
+                      class="form-control feedback-text"
+                      placeholder="Add notes or feedback"
+                    ></textarea>
+                    <button class="btn btn-sm btn-secusses mt-2 save-feedback">
+                      Save Notes
+                    </button>
+                  </div>
+                </div>
+                {% endfor %} {% endif %} {% if module.activities|length > 0 %}
+                <h6 class="mt-3">Activities</h6>
+                {% for activity in module.activities %}
+                <div
+                  class="activity-item"
+                  id="{{ module.id }}-activity-{{ activity.id }}"
+                >
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <strong>{{ activity.title }}</strong> ({{
+                      activity.estimated_time }})
+                      <p class="mb-0 small">{{ activity.description }}</p>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input progress-check"
+                        type="checkbox"
+                        data-step-id="{{ module.id }}-activity-{{ activity.id }}"
+                      />
+                    </div>
+                  </div>
+                  <div class="feedback-box">
+                    <textarea
+                      class="form-control feedback-text"
+                      placeholder="Add notes or feedback"
+                    ></textarea>
+                    <button class="btn btn-sm btn-primary mt-2 save-feedback">
+                      Save Notes
+                    </button>
+                  </div>
+                </div>
+                {% endfor %} {% endif %} {% if module.assessment %}
+                <h6 class="mt-3">Assessment</h6>
+                <div class="activity-item" id="{{ module.id }}-assessment">
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <strong>{{ module.assessment.type }}</strong>
+                      <p class="mb-0 small">
+                        {{ module.assessment.description }}
+                      </p>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input progress-check"
+                        type="checkbox"
+                        data-step-id="{{ module.id }}-assessment"
+                      />
+                    </div>
+                  </div>
+                  <div class="feedback-box">
+                    <textarea
+                      class="form-control feedback-text"
+                      placeholder="Add notes or feedback"
+                    ></textarea>
+                    <button class="btn btn-sm btn-primary mt-2 save-feedback">
+                      Save Notes
+                    </button>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="card mt-4">
+            <div class="card-body">
+              <h5 class="card-title">Next Steps</h5>
+              <p>{{ pathway.next_steps }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card position-sticky" style="top: 20px">
+            <div class="card-header">
+              <h5 class="mb-0">Your Progress</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Overall Progress:</span>
+                <span id="progress-percentage">0%</span>
+              </div>
+              <div class="progress mb-4">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  style="width: 0%"
+                  id="sidebar-progress"
+                ></div>
+              </div>
+
+              <h6>Module Progress</h6>
+              <ul class="list-group" id="module-progress-list">
+                {% for module in pathway.modules %}
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                  data-module-id="{{ module.id }}"
+                >
+                  {{ module.title }}
+                  <span
+                    class="badge bg-primary rounded-pill module-progress-badge"
+                    >0%</span
+                  >
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const pathwayId = {{ pathway_id }};
+          let progressData = {};
+
+          // Load progress data
+          fetch(`/get_progress/${pathwayId}`)
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      progressData = data.progress;
+                      updateProgressUI();
+                  }
+              });
+
+          // Progress check event
+          document.querySelectorAll('.progress-check').forEach(checkbox => {
+              checkbox.addEventListener('change', function() {
+                  const stepId = this.dataset.stepId;
+                  const isCompleted = this.checked;
+                  const parent = this.closest('.resource-item, .activity-item');
+                  const feedbackBox = parent.querySelector('.feedback-box');
+                  const feedbackText = parent.querySelector('.feedback-text');
+
+                  if (isCompleted) {
+                      parent.classList.add('completed');
+                      feedbackBox.style.display = 'block';
+                  } else {
+                      parent.classList.remove('completed');
+                      feedbackBox.style.display = 'none';
+                  }
+
+                  updateProgress(stepId, isCompleted, feedbackText.value);
+              });
+          });
+
+          // Save feedback event
+          document.querySelectorAll('.save-feedback').forEach(button => {
+              button.addEventListener('click', function() {
+                  const parent = this.closest('.resource-item, .activity-item');
+                  const stepId = parent.querySelector('.progress-check').dataset.stepId;
+                  const isCompleted = parent.querySelector('.progress-check').checked;
+                  const feedback = parent.querySelector('.feedback-text').value;
+
+                  updateProgress(stepId, isCompleted, feedback);
+
+                  // Show temporary save confirmation
+                  this.textContent = 'Saved!';
+                  setTimeout(() => {
+                      this.textContent = 'Save Notes';
+                  }, 1500);
+              });
+          });
+
+          // Show feedback when clicking on completed items
+          document.querySelectorAll('.resource-item, .activity-item').forEach(item => {
+              item.addEventListener('click', function(e) {
+                  if (e.target.type !== 'checkbox' && e.target.type !== 'textarea' && !e.target.classList.contains('save-feedback')) {
+                      const checkbox = this.querySelector('.progress-check');
+                      if (checkbox.checked) {
+                          const feedbackBox = this.querySelector('.feedback-box');
+                          feedbackBox.style.display = feedbackBox.style.display === 'none' ? 'block' : 'none';
+                      }
+                  }
+              });
+          });
+
+          // Update progress in the database
+          function updateProgress(stepId, completed, feedback = '') {
+              const formData = new FormData();
+              formData.append('pathway_id', pathwayId);
+              formData.append('step_id', stepId);
+              formData.append('completed', completed);
+              formData.append('feedback', feedback);
+
+              fetch('/update_progress', {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      // Update local progress data
+                      if (!progressData[stepId]) {
+                          progressData[stepId] = {};
+                      }
+                      progressData[stepId].completed = completed;
+                      progressData[stepId].feedback = feedback;
+
+                      updateProgressUI();
+                  }
+              });
+          }
+
+          // Update UI based on progress data
+          function updateProgressUI() {
+              let totalSteps = 0;
+              let completedSteps = 0;
+
+              // Module tracking
+              const moduleSteps = {};
+              const moduleCompletedSteps = {};
+
+              // Process resources and activities
+              document.querySelectorAll('.progress-check').forEach(checkbox => {
+                  const stepId = checkbox.dataset.stepId;
+                  const parent = checkbox.closest('.resource-item, .activity-item');
+                  const feedbackBox = parent.querySelector('.feedback-box');
+                  const feedbackText = parent.querySelector('.feedback-text');
+                  const moduleId = stepId.split('-')[0];
+
+                  totalSteps++;
+
+                  if (!moduleSteps[moduleId]) {
+                      moduleSteps[moduleId] = 0;
+                      moduleCompletedSteps[moduleId] = 0;
+                  }
+                  moduleSteps[moduleId]++;
+
+                  if (progressData[stepId] && progressData[stepId].completed) {
+                      checkbox.checked = true;
+                      parent.classList.add('completed');
+                      completedSteps++;
+                      moduleCompletedSteps[moduleId]++;
+
+                      if (progressData[stepId].feedback) {
+                          feedbackText.value = progressData[stepId].feedback;
+                          feedbackBox.style.display = 'block';
+                      }
+                  } else {
+                      checkbox.checked = false;
+                      parent.classList.remove('completed');
+                  }
+              });
+
+              // Update overall progress
+              const progressPercentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+              document.getElementById('progress-percentage').textContent = `${progressPercentage}%`;
+              document.getElementById('overall-progress').style.width = `${progressPercentage}%`;
+              document.getElementById('sidebar-progress').style.width = `${progressPercentage}%`;
+
+              // Update module progress
+              const moduleProgressBadges = document.querySelectorAll('.module-progress-badge');
+              moduleProgressBadges.forEach(badge => {
+                  const moduleId = badge.closest('li').dataset.moduleId;
+                  const moduleProgress = moduleSteps[moduleId] > 0
+                      ? Math.round((moduleCompletedSteps[moduleId] / moduleSteps[moduleId]) * 100)
+                      : 0;
+                  badge.textContent = `${moduleProgress}%`;
+
+                  // Update module card styling
+                  const moduleCard = document.getElementById(`module-${moduleId}`);
+                  if (moduleProgress === 100) {
+                      moduleCard.classList.add('completed');
+                  } else {
+                      moduleCard.classList.remove('completed');
+                  }
+              });
+          }
+      });
+    </script>
+
+    <button class="chat-button" id="chatButton">💬</button>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Chat Sidebar -->
+    <div class="chat-sidebar" id="chatSidebar">
+      <div class="chat-header btn-dark">
+        <h2>Chat Bot</h2>
+        <button class="close-button" id="closeButton">✕</button>
+      </div>
+      <div class="chat-history" id="chatHistory"></div>
+      <div class="input-container">
+        <input
+          type="text"
+          class="input-field"
+          id="userInput"
+          placeholder="Type your message here..."
+        />
+        <button class="send-button" id="sendButton">Send</button>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const chatButton = document.getElementById("chatButton");
+      const chatSidebar = document.getElementById("chatSidebar");
+      const closeButton = document.getElementById("closeButton");
+      const overlay = document.getElementById("overlay");
+      const userInput = document.getElementById("userInput");
+      const sendButton = document.getElementById("sendButton");
+      const chatHistory = document.getElementById("chatHistory");
+
+      // Open chat sidebar
+      chatButton.addEventListener("click", () => {
+        chatSidebar.classList.add("open");
+        overlay.classList.add("visible");
+      });
+
+      // Close chat sidebar
+      function closeChat() {
+        chatSidebar.classList.remove("open");
+        overlay.classList.remove("visible");
+      }
+
+      closeButton.addEventListener("click", closeChat);
+      overlay.addEventListener("click", closeChat);
+
+      // Add message to chat history
+      function addMessage(message, isUser) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = isUser ? "user-message" : "bot-message";
+        messageDiv.textContent = message;
+
+        const containerDiv = document.createElement("div");
+        containerDiv.className = isUser ? "user-container" : "bot-container";
+        containerDiv.appendChild(messageDiv);
+
+        chatHistory.appendChild(containerDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }
+
+      // Send message to backend
+      function sendMessage() {
+        const message = userInput.value.trim();
+
+        if (message) {
+          addMessage(message, true);
+          userInput.value = "";
+
+          // Add loading indicator
+          const loadingId = "loading-" + Date.now();
+          const loadingDiv = document.createElement("div");
+          loadingDiv.id = loadingId;
+          loadingDiv.className = "bot-message";
+          loadingDiv.textContent = "Thinking...";
+
+          const containerDiv = document.createElement("div");
+          containerDiv.className = "bot-container";
+          containerDiv.appendChild(loadingDiv);
+
+          chatHistory.appendChild(containerDiv);
+          chatHistory.scrollTop = chatHistory.scrollHeight;
+
+          // Send request to the Flask backend
+          fetch("/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: message }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Remove loading indicator
+              const loadingContainer =
+                document.getElementById(loadingId).parentNode;
+              if (loadingContainer) {
+                chatHistory.removeChild(loadingContainer);
+              }
+
+              // Add bot response
+              addMessage(data.response, false);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              // Remove loading indicator
+              const loadingContainer =
+                document.getElementById(loadingId).parentNode;
+              if (loadingContainer) {
+                chatHistory.removeChild(loadingContainer);
+              }
+
+              addMessage(
+                "Sorry, there was an error processing your request.",
+                false
+              );
+            });
+        }
+      }
+
+      // Event listeners for sending messages
+      sendButton.addEventListener("click", sendMessage);
+      userInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+    </script>
+
+    <script>
+              // Add this to your chatbot.html template's script section
+      const chatMessages = document.getElementById('chat-messages');
+      const userMessageInput = document.getElementById('user-message');
+      const sendButton = document.getElementById('send-button');
+      const pathwayId = {{ pathway_id or 'null' }};
+
+      // Store chat history
+      let chatHistory = [];
+
+      // Add a welcome message that acknowledges the pathway context
+      document.addEventListener('DOMContentLoaded', function() {
+          const welcomeMessage = document.createElement('div');
+          welcomeMessage.className = 'message bot-message';
+
+          if (pathwayId) {
+              welcomeMessage.textContent = 'Hello! I\'m your learning assistant for this pathway. I have access to your learning materials and can help answer questions specific to your current topic. How can I assist you today?';
+          } else {
+              welcomeMessage.textContent = 'Hello! I\'m your learning assistant. How can I help you with your learning journey today?';
+          }
+
+          chatMessages.appendChild(welcomeMessage);
+      });
+
+      // Send message when button is clicked
+      sendButton.addEventListener('click', sendMessage);
+      userMessageInput.addEventListener('keyup', function(event) {
+          if (event.key === 'Enter') {
+              sendMessage();
+          }
+      });
+
+      function sendMessage() {
+          const message = userMessageInput.value.trim();
+          if (message === '') return;
+
+          // Add user message to chat
+          const userMessageElement = document.createElement('div');
+          userMessageElement.className = 'message user-message';
+          userMessageElement.textContent = message;
+          chatMessages.appendChild(userMessageElement);
+
+          // Store in chat history
+          chatHistory.push({
+              role: 'user',
+              content: message
+          });
+
+          // Clear input
+          userMessageInput.value = '';
+
+          // Show typing indicator
+          const typingIndicator = document.createElement('div');
+          typingIndicator.className = 'message bot-message typing';
+          typingIndicator.textContent = 'Thinking...';
+          chatMessages.appendChild(typingIndicator);
+
+          // Send message to server
+          fetch('/chat', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  message: message,
+                  pathway_id: pathwayId,
+                  chat_history: chatHistory  // Send the full chat history
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              // Remove typing indicator
+              chatMessages.removeChild(typingIndicator);
+
+              // Add bot response to chat
+              const botMessageElement = document.createElement('div');
+              botMessageElement.className = 'message bot-message';
+              botMessageElement.innerHTML = data.response;
+              chatMessages.appendChild(botMessageElement);
+
+              // Store in chat history
+              chatHistory.push({
+                  role: 'assistant',
+                  content: data.response
+              });
+
+              // Scroll to bottom
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              // Remove typing indicator
+              chatMessages.removeChild(typingIndicator);
+
+              // Add error message
+              const errorMessage = document.createElement('div');
+              errorMessage.className = 'message bot-message error';
+              errorMessage.textContent = 'Sorry, there was an error processing your request. Please try again.';
+              chatMessages.appendChild(errorMessage);
+          });
+
+          // Scroll to bottom
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gemini Chatbot</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        position: relative;
+        min-height: 100vh;
+      }
+      .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .chat-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+      }
+      .chat-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 380px;
+        height: 100%;
+        background-color: white;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+      }
+      .chat-sidebar.open {
+        right: 0;
+      }
+      .chat-header {
+        padding: 15px;
+        background-color: #4285f4;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .close-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .chat-history {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+      }
+      .input-container {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+      }
+      .input-field {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .send-button {
+        padding: 10px 20px;
+        margin-left: 10px;
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .user-message {
+        background-color: #e6f7ff;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        align-self: flex-end;
+        word-wrap: break-word;
+      }
+      .bot-message {
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        align-self: flex-start;
+        word-wrap: break-word;
+      }
+      .message-container {
+        display: flex;
+        flex-direction: column;
+      }
+      .user-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+      }
+      .bot-container {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 10px;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 900;
+      }
+      .overlay.visible {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-content">
+      <h1>Gemini AI Chatbot</h1>
+      <p>
+        Welcome to the Gemini AI Chatbot! Click the chat button in the bottom
+        right corner to start chatting.
+      </p>
+    </div>
+
+    <!-- Chat Button -->
+    <button class="chat-button" id="chatButton">💬</button>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Chat Sidebar -->
+    <div class="chat-sidebar" id="chatSidebar">
+      <div class="chat-header">
+        <h2>Gemini Chat</h2>
+        <button class="close-button" id="closeButton">✕</button>
+      </div>
+      <div class="chat-history" id="chatHistory"></div>
+      <div class="input-container">
+        <input
+          type="text"
+          class="input-field"
+          id="userInput"
+          placeholder="Type your message here..."
+        />
+        <button class="send-button" id="sendButton">Send</button>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const chatButton = document.getElementById("chatButton");
+      const chatSidebar = document.getElementById("chatSidebar");
+      const closeButton = document.getElementById("closeButton");
+      const overlay = document.getElementById("overlay");
+      const userInput = document.getElementById("userInput");
+      const sendButton = document.getElementById("sendButton");
+      const chatHistory = document.getElementById("chatHistory");
+
+      // Open chat sidebar
+      chatButton.addEventListener("click", () => {
+        chatSidebar.classList.add("open");
+        overlay.classList.add("visible");
+      });
+
+      // Close chat sidebar
+      function closeChat() {
+        chatSidebar.classList.remove("open");
+        overlay.classList.remove("visible");
+      }
+
+      closeButton.addEventListener("click", closeChat);
+      overlay.addEventListener("click", closeChat);
+
+      // Add message to chat history
+      function addMessage(message, isUser) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = isUser ? "user-message" : "bot-message";
+        messageDiv.textContent = message;
+
+        const containerDiv = document.createElement("div");
+        containerDiv.className = isUser ? "user-container" : "bot-container";
+        containerDiv.appendChild(messageDiv);
+
+        chatHistory.appendChild(containerDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }
+
+      // Send message to backend
+      function sendMessage() {
+        const message = userInput.value.trim();
+
+        if (message) {
+          addMessage(message, true);
+          userInput.value = "";
+
+          // Add loading indicator
+          const loadingId = "loading-" + Date.now();
+          const loadingDiv = document.createElement("div");
+          loadingDiv.id = loadingId;
+          loadingDiv.className = "bot-message";
+          loadingDiv.textContent = "Thinking...";
+
+          const containerDiv = document.createElement("div");
+          containerDiv.className = "bot-container";
+          containerDiv.appendChild(loadingDiv);
+
+          chatHistory.appendChild(containerDiv);
+          chatHistory.scrollTop = chatHistory.scrollHeight;
+
+          // Send request to the Flask backend
+          fetch("/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: message }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // Remove loading indicator
+              const loadingContainer =
+                document.getElementById(loadingId).parentNode;
+              if (loadingContainer) {
+                chatHistory.removeChild(loadingContainer);
+              }
+
+              // Add bot response
+              addMessage(data.response, false);
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              // Remove loading indicator
+              const loadingContainer =
+                document.getElementById(loadingId).parentNode;
+              if (loadingContainer) {
+                chatHistory.removeChild(loadingContainer);
+              }
+
+              addMessage(
+                "Sorry, there was an error processing your request.",
+                false
+              );
+            });
+        }
+      }
+
+      // Event listeners for sending messages
+      sendButton.addEventListener("click", sendMessage);
+      userInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          sendMessage();
+        }
+      });
+    </script>
+  </body>
+</html>

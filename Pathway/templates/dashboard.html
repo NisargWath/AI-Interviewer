@@ -1,0 +1,255 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Education Portal</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+
+    <link
+      href="/static/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="/static/css/fontawesome.css" />
+    <link rel="stylesheet" href="/static/css/templatemo-grad-school.css" />
+    <link rel="stylesheet" href="/static/css/owl.css" />
+    <link rel="stylesheet" href="/static/css/lightbox.css" />
+
+
+
+    <style>
+      body {
+        padding-top: 80px; /* Adjust according to navbar height */
+      }
+    </style>
+    <header>
+        <nav class="navbar  px-3" style="background-color: #ffffff;">
+          <div class="container-fluid d-flex align-items-center">
+         
+              <a href="/" class="logo" style="text-decoration: none; font-size: 24px; font-weight: bold; color: #000;">
+                  <span class="logo-icon" style="font-size: 28px;">⏳</span>
+                  <span style="padding: 5px 10px; border-radius: 5px;">IntervoAI</span>
+              </a>
+              <a href="javascript:history.back()" class="btn btn-dark btn-sm me-3" style="font-size: 18px; font-weight: bold; color: #fff;">
+                 Back
+              </a>
+          </div>
+      </nav>
+    </header>
+  </head>
+  <body>
+
+
+    <div class="container mt-4">
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <h1>Your Learning Pathways</h1>
+        </div>
+        <div class="col-md-4 text-end">
+          <button
+            type="button"
+            class="btn btn-dark"
+            data-bs-toggle="modal"
+            data-bs-target="#createPathwayModal"
+          >
+            Create New Pathway
+          </button>
+        </div>
+      </div>
+
+      {% if pathways %}
+      <div class="row">
+        {% for pathway in pathways %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ pathway.topic }}</h5>
+              <p class="card-text">Created on: {{ pathway.created_at }}</p>
+              <div class="progress mb-3">
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  style="width: {{ pathway.progress_percentage }}%;"
+                  aria-valuenow="{{ pathway.progress_percentage }}"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  {{ pathway.progress_percentage|round(1) }}%
+                </div>
+              </div>
+              <p class="card-text">
+                {{ pathway.completed_steps }} of {{ pathway.total_steps }} steps
+                completed
+              </p>
+              <a href="/pathway/{{ pathway.id }}" class="btn btn-dark"
+                >Continue Learning</a
+              >
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        You haven't created any learning pathways yet. Get started by creating
+        your first pathway!
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Create Pathway Modal -->
+    <div
+      class="modal fade"
+      id="createPathwayModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create New Learning Pathway</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="pathwayForm">
+              <div class="mb-3">
+                <label for="topic" class="form-label"
+                  >What do you want to learn?</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="topic"
+                  name="topic"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="learning_style" class="form-label"
+                  >Learning Style (Optional)</label
+                >
+                <select
+                  class="form-select"
+                  id="learning_style"
+                  name="learning_style"
+                >
+                  <option value="">Use my preferences</option>
+                  <option value="Visual">Visual</option>
+                  <option value="Auditory">Auditory</option>
+                  <option value="Reading/Writing">Reading/Writing</option>
+                  <option value="Kinesthetic">Kinesthetic</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="study_time" class="form-label"
+                  >Available Study Time (hours/week) (Optional)</label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  id="study_time"
+                  name="study_time"
+                />
+              </div>
+              <div id="generatingMessage" class="d-none">
+                <div class="d-flex justify-content-center">
+                  <div class="spinner-border text-warning" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+                <p class="text-center mt-2">
+                  Generating your personalized learning pathway...
+                </p>
+              </div>
+              <div class="alert alert-danger d-none" id="errorMessage"></div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-dark"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-dark" id="generateButton">
+              Generate Pathway
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document
+        .getElementById("generateButton")
+        .addEventListener("click", function () {
+          const form = document.getElementById("pathwayForm");
+          const formData = new FormData(form);
+
+          if (!formData.get("topic")) {
+            document.getElementById("errorMessage").textContent =
+              "Please enter a topic to learn.";
+            document.getElementById("errorMessage").classList.remove("d-none");
+            return;
+          }
+
+          document.getElementById("errorMessage").classList.add("d-none");
+          document
+            .getElementById("generatingMessage")
+            .classList.remove("d-none");
+          document.getElementById("generateButton").disabled = true;
+
+          fetch("/generate_pathway", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document
+                .getElementById("generatingMessage")
+                .classList.add("d-none");
+              document.getElementById("generateButton").disabled = false;
+
+              if (data.success) {
+                window.location.href = `/pathway/${data.pathway_id}`;
+              } else {
+                document.getElementById("errorMessage").textContent =
+                  data.message;
+                document
+                  .getElementById("errorMessage")
+                  .classList.remove("d-none");
+              }
+            })
+            .catch((error) => {
+              document
+                .getElementById("generatingMessage")
+                .classList.add("d-none");
+              document.getElementById("generateButton").disabled = false;
+              document.getElementById("errorMessage").textContent =
+                "An error occurred. Please try again.";
+              document
+                .getElementById("errorMessage")
+                .classList.remove("d-none");
+              console.error("Error:", error);
+            });
+        });
+    </script>
+  </body>
+</html>

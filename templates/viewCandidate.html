@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume ATS System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .page {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .page.active {
+            display: block;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .resume-selector {
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            padding: 30px;
+            text-align: center;
+            background-color: #f8fafc;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input[type="text"], 
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+        }
+        .btn-secondary:hover {
+            background-color: #6c7a7a;
+        }
+        .resume-info {
+            margin-top: 15px;
+            font-size: 14px;
+            text-align: left;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .results-container {
+            margin-top: 30px;
+        }
+        .result-card {
+            background-color: #f8fafc;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .keyword-match {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .keyword {
+            background-color: #e1f5fe;
+            border-radius: 15px;
+            padding: 5px 12px;
+            font-size: 14px;
+        }
+        .keyword.matched {
+            background-color: #c8e6c9;
+        }
+        .progress-bar {
+            background-color: #ecf0f1;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress {
+            height: 100%;
+            background-color: #2ecc71;
+        }
+        .section-heading {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin: 30px 0 20px;
+            color: #2c3e50;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+        .job-select-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .job-select-container select {
+            flex: 1;
+        }
+        .job-select-container button {
+            flex-shrink: 0;
+        }
+        .preset-job-info {
+            margin-top: 10px;
+            font-size: 14px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar py-1 px-5" style="background-color: #e6f0ff;">
+        <div class="container-fluid d-flex align-items-center">
+            <a href="/" class="logo" style="text-decoration: none; font-size: 24px; font-weight: bold; color: #000;">
+                <span class="logo-icon" style="font-size: 28px;">⏳</span>
+                <span style="padding: 5px 10px; border-radius: 5px;">IntervoAI</span>
+            </a>
+            <a href="javascript:history.back()" class="btn btn-sm me-3 text-de" style="font-size: 18px; font-weight: bold; color: #fff;">
+                <i class="fas fa-arrow-right"></i> Back
+            </a>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="page1" class="page active">
+            <h1>Resume ATS System</h1>
+            
+            <div class="resume-selector">
+                <h2>Select Candidate</h2>
+                <p>Choose a candidate to analyze their resume</p>
+                <div class="form-group">
+                    <select id="candidateSelect" class="form-control">
+                        <option value="">-- Select a Candidate --</option>
+                        <option value="nisarg">Nisarg Wath</option>
+                        <option value="pranav">Pranav Bhoite</option>
+                        <option value="raj">Raj Singh</option>
+                        <option value="aisha">Aisha Khan</option>
+                        <option value="sneha">Sneha Desai</option>
+                    </select>
+                </div>
+                <div class="resume-info" id="resumeInfo">
+                    <p>Select a candidate to view their resume details</p>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="jobTitleSelect">Target Job Title</label>
+                <div class="job-select-container">
+                    <select id="jobTitleSelect">
+                        <option value="">-- Select Job Title --</option>
+                        <option value="software-engineer">Software Engineer</option>
+                        <option value="data-scientist">Data Scientist</option>
+                        <option value="marketing-manager">Marketing Manager</option>
+                        <option value="project-manager">Project Manager</option>
+                        <option value="ux-designer">UX Designer</option>
+                    </select>
+                    <button class="btn" id="loadJobBtn">Load Job</button>
+                </div>
+                <div class="preset-job-info">Or enter a custom job title below:</div>
+                <input type="text" id="jobTitle" placeholder="e.g., Software Engineer, Marketing Manager">
+            </div>
+            
+            <div class="form-group">
+                <label for="jobDescription">Job Description (for keyword analysis)</label>
+                <textarea id="jobDescription" rows="5" placeholder="Paste the job description here for better matching..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="industry">Industry</label>
+                <select id="industry">
+                    <option value="">Select Industry</option>
+                    <option value="tech">Technology</option>
+                    <option value="healthcare">Healthcare</option>
+                    <option value="finance">Finance</option>
+                    <option value="education">Education</option>
+                    <option value="manufacturing">Manufacturing</option>
+                    <option value="retail">Retail</option>
+                    <option value="marketing">Marketing & Advertising</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="loader" id="loader"></div>
+            
+            <div class="nav-buttons">
+                <div></div> <!-- Empty div for spacing -->
+                <button class="btn" id="analyzeBtn">Analyze Resume</button>
+            </div>
+        </div>
+        
+        <div id="page2" class="page">
+            <h1>Resume Analysis Results</h1>
+            
+            <div class="results-container" id="resultsContainer">
+                <div class="result-card">
+                    <h2>ATS Compatibility Score</h2>
+                    <div class="score" id="overallScore">85%</div>
+                    <div class="progress-bar">
+                        <div class="progress" id="scoreProgress" style="width: 85%;"></div>
+                    </div>
+                    <p>Your resume is well-formatted for ATS systems.</p>
+                </div>
+                
+                <div class="result-card">
+                    <h2>Keyword Match Analysis</h2>
+                    <p>Based on the job description, we found these keyword matches:</p>
+                    <div class="keyword-match" id="keywordMatches">
+                        <!-- Keywords will be added here -->
+                    </div>
+                    <div class="section-heading">Missing Important Keywords</div>
+                    <div class="keyword-match" id="missingKeywords">
+                        <!-- Missing keywords will be added here -->
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h2>Experience & Skills Assessment</h2>
+                    <div id="skillsAssessment">
+                        <!-- Skills assessment will be added here -->
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h2>AI Recommendations</h2>
+                    <ul id="recommendations">
+                        <!-- Recommendations will be added here -->
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="backBtn"> <a href="http://127.0.0.1:5000/results">See The Interview Reuslt</a></button>
+                <button class="btn" id="downloadBtn">Download Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const candidateSelect = document.getElementById('candidateSelect');
+            const resumeInfo = document.getElementById('resumeInfo');
+            const jobTitleSelect = document.getElementById('jobTitleSelect');
+            const jobTitle = document.getElementById('jobTitle');
+            const jobDescription = document.getElementById('jobDescription');
+            const loadJobBtn = document.getElementById('loadJobBtn');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const backBtn = document.getElementById('backBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const page1 = document.getElementById('page1');
+            const page2 = document.getElementById('page2');
+            const loader = document.getElementById('loader');
+            
+            // Candidate resume data (in a real app, this would be loaded from files)
+            const candidateData = {
+                'nisarg': {
+                    name: 'Nisarg Wath',
+                    resumePath: 'static/uploads/Resume/nisarg_resume.pdf',
+                    experience: '4 years',
+                    skills: ['React.js', 'Node.js', 'MongoDB', 'Express', 'JavaScript', 'HTML/CSS', 'Git', 'AWS'],
+                    education: 'B.Tech Computer Science, COEP University',
+                    position: 'Full Stack Developer'
+                },
+                'pranav': {
+                    name: 'Pranav Bhoite',
+                    resumePath: 'static/uploads/Resume/pranav_resume.pdf',
+                    experience: '6 years',
+                    skills: ['Python', 'TensorFlow', 'PyTorch', 'SQL', 'Data Visualization', 'Machine Learning', 'NLP'],
+                    education: 'B.Tech Computer Science, COEP University',
+                    position: 'Senior Data Scientist'
+                },
+                'raj': {
+                    name: 'Raj Singh',
+                    resumePath: 'static/uploads/Resume/raj_resume.pdf',
+                    experience: '8 years',
+                    skills: ['Project Management', 'Scrum', 'Agile', 'JIRA', 'Confluence', 'Risk Management', 'Stakeholder Management'],
+                    education: 'MBA, Delhi University',
+                    position: 'Senior Project Manager'
+                },
+                'aisha': {
+                    name: 'Aisha Khan',
+                    resumePath: 'static/uploads/Resume/aisha_resume.pdf',
+                    experience: '5 years',
+                    skills: ['UI/UX Design', 'Figma', 'Adobe XD', 'Sketch', 'User Research', 'Wireframing', 'Prototyping'],
+                    education: 'Bachelor of Design, NID Ahmedabad',
+                    position: 'Senior UX Designer'
+                },
+                'sneha': {
+                    name: 'Sneha Desai',
+                    resumePath: 'static/uploads/Resume/sneha_resume.pdf',
+                    experience: '7 years',
+                    skills: ['Digital Marketing', 'SEO/SEM', 'Social Media Marketing', 'Content Strategy', 'Google Analytics', 'Campaign Management'],
+                    education: 'MBA Marketing, NMIMS Mumbai',
+                    position: 'Marketing Manager'
+                }
+            };
+            
+            // Job descriptions data
+            const jobData = {
+                'software-engineer': {
+                    title: 'Software Engineer',
+                    description: `We are seeking a skilled Software Engineer to join our development team. The ideal candidate will have strong experience in JavaScript, React, Node.js, and REST APIs. Responsibilities include designing and implementing new features, optimizing application performance, writing clean, maintainable code, and collaborating with cross-functional teams. Requirements: At least 3 years of experience in software development, proficiency in JavaScript frameworks, experience with Git, and a BS in Computer Science or related field.`,
+                    industry: 'tech'
+                },
+                'data-scientist': {
+                    title: 'Data Scientist',
+                    description: `We're looking for an experienced Data Scientist to analyze complex data and build predictive models. The role requires expertise in Python, machine learning algorithms, and data visualization. You will work with large datasets, develop statistical models, and communicate insights to stakeholders. Requirements: 3+ years of experience in data science, proficiency in Python, TensorFlow, and SQL, experience with NLP is a plus. Master's degree in Data Science, Statistics, or related field preferred.`,
+                    industry: 'tech'
+                },
+                'marketing-manager': {
+                    title: 'Marketing Manager',
+                    description: `We are hiring a Marketing Manager to develop and implement marketing strategies. The ideal candidate will have experience in digital marketing, SEO/SEM, social media campaigns, and content strategy. Responsibilities include managing marketing budgets, analyzing campaign performance, and coordinating with the sales team. Requirements: 5+ years of marketing experience, proven track record in campaign management, proficiency in Google Analytics, and excellent communication skills.`,
+                    industry: 'marketing'
+                },
+                'project-manager': {
+                    title: 'Project Manager',
+                    description: `We are looking for a Project Manager to lead teams and ensure timely delivery of projects. The ideal candidate will have a strong background in Agile methodologies, risk management, and stakeholder communication. Responsibilities include planning and executing projects, managing resources, and tracking progress. Requirements: 5+ years of project management experience, PMP certification, experience with JIRA and other project management tools, and excellent leadership skills.`,
+                    industry: 'tech'
+                },
+                'ux-designer': {
+                    title: 'UX Designer',
+                    description: `We are seeking a UX Designer to create engaging and intuitive user experiences. The ideal candidate will have expertise in user research, wireframing, prototyping, and usability testing. Responsibilities include designing user flows, creating mockups, and collaborating with developers. Requirements: 3+ years of UX design experience, proficiency in Figma and Adobe XD, portfolio demonstrating design thinking, and a degree in Design or related field.`,
+                    industry: 'tech'
+                }
+            };
+            
+            // Handle candidate selection change
+            candidateSelect.addEventListener('change', () => {
+                const selectedCandidate = candidateSelect.value;
+                if (selectedCandidate && candidateData[selectedCandidate]) {
+                    const candidate = candidateData[selectedCandidate];
+                    resumeInfo.innerHTML = `
+                        <h3>${candidate.name}</h3>
+                        <p><strong>Resume Path:</strong> ${candidate.resumePath}</p>
+                        <p><strong>Current Position:</strong> ${candidate.position}</p>
+                        <p><strong>Experience:</strong> ${candidate.experience}</p>
+                        <p><strong>Education:</strong> ${candidate.education}</p>
+                        <p><strong>Skills:</strong> ${candidate.skills.join(', ')}</p>
+                    `;
+                    analyzeBtn.disabled = false;
+                } else {
+                    resumeInfo.innerHTML = `<p>Select a candidate to view their resume details</p>`;
+                    analyzeBtn.disabled = true;
+                }
+            });
+            
+            // Handle load job button click
+            loadJobBtn.addEventListener('click', () => {
+                const selectedJob = jobTitleSelect.value;
+                if (selectedJob && jobData[selectedJob]) {
+                    const job = jobData[selectedJob];
+                    jobTitle.value = job.title;
+                    jobDescription.value = job.description;
+                    
+                    // Auto-select the industry
+                    const industrySelect = document.getElementById('industry');
+                    if (job.industry) {
+                        industrySelect.value = job.industry;
+                    }
+                }
+            });
+            
+            // Sample keywords for demonstration
+            const commonJobKeywords = {
+                'tech': ['javascript', 'python', 'react', 'node.js', 'aws', 'cloud', 'agile', 'devops', 'full-stack'],
+                'healthcare': ['patient care', 'medical records', 'clinical', 'healthcare', 'nursing', 'patient safety'],
+                'finance': ['financial analysis', 'accounting', 'budget', 'forecasting', 'compliance', 'risk management'],
+                'education': ['curriculum', 'teaching', 'assessment', 'student engagement', 'classroom management'],
+                'manufacturing': ['quality control', 'lean', 'six sigma', 'production', 'supply chain', 'inventory'],
+                'retail': ['customer service', 'merchandising', 'sales', 'inventory management', 'pos'],
+                'marketing': ['digital marketing', 'seo', 'content strategy', 'analytics', 'social media', 'campaign management']
+            };
+            
+            // Mock AI analysis function
+            function analyzeResume(candidateId, jobTitle, jobDescription, industry) {
+                return new Promise((resolve) => {
+                    // This simulates API processing time
+                    setTimeout(() => {
+                        // Get the selected candidate data
+                        const candidate = candidateData[candidateId];
+                        
+                        // Extract keywords from job description
+                        const jobKeywords = extractKeywords(jobDescription);
+                        
+                        // Add industry-specific keywords
+                        const industryKeywords = commonJobKeywords[industry] || [];
+                        const allKeywords = [...new Set([...jobKeywords, ...industryKeywords])];
+                        
+                        // Match candidate skills with keywords
+                        const matchedKeywords = [];
+                        const missingKeywords = [];
+                        
+                        allKeywords.forEach(keyword => {
+                            // Check if any candidate skill matches this keyword
+                            if (candidate.skills.some(skill => skill.toLowerCase().includes(keyword)) || 
+                                Math.random() > 0.4) { // Add some randomness for demo
+                                matchedKeywords.push(keyword);
+                            } else {
+                                missingKeywords.push(keyword);
+                            }
+                        });
+                        
+                        // Calculate score based on matches
+                        const score = Math.min(100, Math.floor(65 + (matchedKeywords.length / allKeywords.length) * 35));
+                        
+                        // Generate recommendations
+                        const recommendations = generateRecommendations(score, missingKeywords);
+                        
+                        // Generate skills assessment
+                        const skills = generateSkillsAssessment(matchedKeywords);
+                        
+                        resolve({
+                            candidateName: candidate.name,
+                            score,
+                            matchedKeywords,
+                            missingKeywords,
+                            recommendations,
+                            skills
+                        });
+                    }, 2000); // Simulate 2 second processing time
+                });
+            }
+            
+            function extractKeywords(text) {
+                if (!text) return [];
+                
+                // Basic keyword extraction (in a real app, this would be more sophisticated)
+                const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+                const stopWords = ['and', 'the', 'is', 'in', 'to', 'for', 'of', 'a', 'with', 'on', 'as'];
+                
+                // Filter out common words and short words
+                const filteredWords = words.filter(word => 
+                    !stopWords.includes(word) && word.length > 3
+                );
+                
+                // Get unique words and take top 15
+                return [...new Set(filteredWords)].slice(0, 15);
+            }
+            
+            function generateRecommendations(score, missingKeywords) {
+                const recommendations = [];
+                
+                if (score < 70) {
+                    recommendations.push("The resume needs significant improvements to pass ATS systems.");
+                    recommendations.push("Consider reformatting the resume to a more ATS-friendly template.");
+                } else if (score < 85) {
+                    recommendations.push("The resume is good but could use some improvements for better ATS performance.");
+                }
+                
+                if (missingKeywords.length > 0) {
+                    recommendations.push(`Add these missing keywords to the resume: ${missingKeywords.slice(0, 5).join(', ')}.`);
+                }
+                
+                recommendations.push("Ensure the resume uses a clean, simple format with standard section headings.");
+                recommendations.push("Quantify achievements with metrics and numbers where possible.");
+                
+                return recommendations;
+            }
+            
+            function generateSkillsAssessment(matchedKeywords) {
+                const categories = {
+                    'Technical Skills': [],
+                    'Soft Skills': [],
+                    'Industry Knowledge': []
+                };
+                
+                // Categorize skills (simplified for demo)
+                matchedKeywords.forEach(keyword => {
+                    if (['javascript', 'python', 'react', 'aws', 'cloud', 'database', 'sql', 'analytics', 'algorithm'].some(tech => keyword.includes(tech))) {
+                        categories['Technical Skills'].push(keyword);
+                    } else if (['communication', 'leadership', 'teamwork', 'problem', 'solving', 'management', 'organization'].some(soft => keyword.includes(soft))) {
+                        categories['Soft Skills'].push(keyword);
+                    } else {
+                        categories['Industry Knowledge'].push(keyword);
+                    }
+                });
+                
+                return categories;
+            }
+            
+            // Handle analyze button click
+            analyzeBtn.addEventListener('click', async () => {
+                const candidateId = candidateSelect.value;
+                const jobTitleValue = jobTitle.value;
+                const jobDescriptionValue = jobDescription.value;
+                const industry = document.getElementById('industry').value;
+                
+                if (!candidateId) {
+                    alert('Please select a candidate.');
+                    return;
+                }
+                
+                if (!jobTitleValue) {
+                    alert('Please enter a job title.');
+                    return;
+                }
+                
+                // Show loader
+                loader.style.display = 'block';
+                analyzeBtn.disabled = true;
+                
+                try {
+                    // Call the mock analysis function
+                    const results = await analyzeResume(candidateId, jobTitleValue, jobDescriptionValue, industry);
+                    
+                    // Update UI with results
+                    updateResultsUI(results);
+                    
+                    // Switch to results page
+                    page1.classList.remove('active');
+                    page2.classList.add('active');
+                } catch (error) {
+                    console.error('Error analyzing resume:', error);
+                    alert('An error occurred while analyzing the resume. Please try again.');
+                } finally {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    analyzeBtn.disabled = false;
+                }
+            });
+            
+            function updateResultsUI(results) {
+                // Update score
+                document.getElementById('overallScore').textContent = `${results.score}%`;
+                document.getElementById('scoreProgress').style.width = `${results.score}%`;
+                
+                // Update keyword matches
+                const keywordMatchesEl = document.getElementById('keywordMatches');
+                keywordMatchesEl.innerHTML = '';
+                results.matchedKeywords.forEach(keyword => {
+                    const keywordEl = document.createElement('div');
+                    keywordEl.className = 'keyword matched';
+                    keywordEl.textContent = keyword;
+                    keywordMatchesEl.appendChild(keywordEl);
+                });
+                
+                // Update missing keywords
+                const missingKeywordsEl = document.getElementById('missingKeywords');
+                missingKeywordsEl.innerHTML = '';
+                results.missingKeywords.forEach(keyword => {
+                    const keywordEl = document.createElement('div');
+                    keywordEl.className = 'keyword';
+                    keywordEl.textContent = keyword;
+                    missingKeywordsEl.appendChild(keywordEl);
+                });
+                
+                // Update skills assessment
+                const skillsAssessmentEl = document.getElementById('skillsAssessment');
+                skillsAssessmentEl.innerHTML = '';
+                
+                for (const [category, skills] of Object.entries(results.skills)) {
+                    if (skills.length > 0) {
+                        const categoryHeading = document.createElement('div');
+                        categoryHeading.className = 'section-heading';
+                        categoryHeading.textContent = category;
+                        skillsAssessmentEl.appendChild(categoryHeading);
+                        
+                        const skillsContainer = document.createElement('div');
+                        skillsContainer.className = 'keyword-match';
+                        
+                        skills.forEach(skill => {
+                            const skillEl = document.createElement('div');
+                            skillEl.className = 'keyword matched';
+                            skillEl.textContent = skill;
+                            skillsContainer.appendChild(skillEl);
+                        });
+                        
+                        skillsAssessmentEl.appendChild(skillsContainer);
+                    }
+                }
+                
+                // Update recommendations
+                const recommendationsEl = document.getElementById('recommendations');
+                recommendationsEl.innerHTML = '';
+                
+                results.recommendations.forEach(recommendation => {
+                    const li = document.createElement('li');
+                    li.textContent = recommendation;
+                    recommendationsEl.appendChild(li);
+                });
+            }
+            
+            // Handle back button click
+            backBtn.addEventListener('click', () => {
+                page2.classList.remove('active');
+                page1.classList.add('active');
+            });
+            
+            // Handle download button click (mock functionality)
+            downloadBtn.addEventListener('click', () => {
+                alert('In a complete application, this would generate and download a PDF report of your results.');
+            });
+        });
+    </script>
+</body>
+</html>
