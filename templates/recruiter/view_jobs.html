@@ -3,43 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Listings</title>
+    <title>Job Listings | Job Seeker Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .dashboard-header {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .job-card {
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+        }
+        
+        .job-card .card-body {
+            padding: 25px;
+        }
+        
+        .job-card .card-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .job-card .card-subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+        
+        .job-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .job-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .job-tag.salary {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+        }
+        
+        .job-tag.date {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .job-tag.type {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .job-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .view-details-btn {
+            color: #0d6efd;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: 1px solid #0d6efd;
+            background-color: white;
+            transition: background-color 0.3s, color 0.3s;
+            cursor: pointer;
+        }
+        
+        .view-details-btn:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .apply-btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .page-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            border-radius: 50px;
+            padding: 10px 20px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .job-detail-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .job-detail-section:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            color: #495057;
+        }
+        
+        .company-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f0f4f8;
+            padding: 8px 15px;
+            border-radius: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .company-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .filter-dropdown {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            background-color: white;
+        }
+        
+        .bookmark-btn {
+            color: #6c757d;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+        
+        .bookmark-btn:hover {
+            color: #ffc107;
+        }
+        
+        .bookmark-btn.active {
+            color: #ffc107;
+        }
+    </style>
 </head>
 <body>
+    <nav class="navbar py-1 px-5" style="background-color: #e6f0ff;">
+        <div class="container-fluid d-flex align-items-center">
+       
+            <a href="/" class="logo" style="text-decoration: none; font-size: 24px; font-weight: bold; color: #000;">
+                <span class="logo-icon" style="font-size: 28px;">⏳</span>
+                <span style="padding: 5px 10px; border-radius: 5px;">IntervoAI</span>
+            </a>
+            <a href="javascript:history.back()" class="btn btn-success btn-sm me-3" style="font-size: 18px; font-weight: bold; color: #fff;">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </nav>
     <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Job Listings</h1>
-            <a href="/create_job" class="btn btn-primary">Post a New Job</a>
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="page-title mb-md-0">Our Job posts</h1>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-md-end mt-3 mt-md-0">
+                        <div class="input-group me-2">
+                            <input type="text" class="form-control search-box" placeholder="Search jobs...">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="dropdown ms-2">
+                            <button class="filter-dropdown dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter me-1"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                                <li><a class="dropdown-item" href="#">Most Recent</a></li>
+                                <li><a class="dropdown-item" href="#">Highest Salary</a></li>
+                                <li><a class="dropdown-item" href="#">Remote Only</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">All Jobs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         {% if jobs %}
             <div class="row">
                 {% for job in jobs %}
                     <div class="col-md-6 mb-4">
-                        <div class="card h-100">
+                        <div class="card job-card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">{{ job.title }}</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">{{ job.company }} - {{ job.location }}</h6>
-                                <p class="card-text">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title">{{ job.title }}</h5>
+                                    <button class="bookmark-btn" title="Save this job">
+                                        <i class="far fa-bookmark"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="company-badge">
+                                    <div class="company-logo">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    {{ job.company }}
+                                </div>
+                                
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ job.location }}
+                                </h6>
+                                
+                                <div class="job-tags">
                                     {% if job.salary %}
-                                        <strong>Salary:</strong> {{ job.salary }}<br>
+                                        <span class="job-tag salary">
+                                            <i class="fas fa-dollar-sign me-1"></i>{{ job.salary }}
+                                        </span>
                                     {% endif %}
-                                    <strong>Posted:</strong> {{ job.date_posted.strftime('%Y-%m-%d') }}
-                                </p>
-                                <p class="card-text">{{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}</p>
-                                <a href="/job/{{ job._id }}" class="btn btn-outline-primary">View Details</a>
+                                    
+                                    <span class="job-tag date">
+                                        <i class="fas fa-calendar-alt me-1"></i>Posted: {{ job.date_posted.strftime('%Y-%m-%d') }}
+                                    </span>
+                                    
+                                    {% if job.job_type %}
+                                        <span class="job-tag type">
+                                            <i class="fas fa-briefcase me-1"></i>{{ job.job_type }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if job.description %}
+                                    <p class="mt-3">{{ job.description[:100] }}{% if job.description|length > 100 %}...{% endif %}</p>
+                                {% endif %}
+                                
+                                <div class="job-footer">
+                                    <button type="button" class="view-details-btn" data-bs-toggle="modal" data-bs-target="#jobModal{{ job._id }}">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </button>
+                                    <a href="/apply/{{ job._id }}" class="btn btn-success apply-btn">
+                                        <i class="fas fa-paper-plane me-1"></i>Applied Candidates
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Job Details Modal -->
+                    <div class="modal fade" id="jobModal{{ job._id }}" tabindex="-1" aria-labelledby="jobModalLabel{{ job._id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="jobModalLabel{{ job._id }}">{{ job.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="job-detail-section">
+                                        <div class="company-badge">
+                                            <div class="company-logo">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            {{ job.company }}
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="detail-label">
+                                                        <i class="fas fa-map-marker-alt me-2"></i>Location
+                                                    </div>
+                                                    <div class="detail-value">{{ job.location }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="detail-label">
+                                                        <i class="fas fa-calendar-alt me-2"></i>Posted
+                                                    </div>
+                                                    <div class="detail-value">{{ job.date_posted.strftime('%Y-%m-%d') }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="detail-label">
+                                                        <i class="fas fa-dollar-sign me-2"></i>Salary
+                                                    </div>
+                                                    <div class="detail-value">{{ job.salary }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="detail-label">
+                                                        <i class="fas fa-briefcase me-2"></i>Job Type
+                                                    </div>
+                                                    <div class="detail-value">{{ job.job_type|default('Not specified') }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="job-detail-section">
+                                        <div class="detail-label">
+                                            <i class="fas fa-align-left me-2"></i>Job Description
+                                        </div>
+                                        <div class="detail-value">
+                                            <p>{{ job.description }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="job-detail-section">
+                                        <div class="detail-label">
+                                            <i class="fas fa-list-check me-2"></i>Requirements
+                                        </div>
+                                        <div class="detail-value">
+                                            <p>{{ job.requirements }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if job.benefits %}
+                                    <div class="job-detail-section">
+                                        <div class="detail-label">
+                                            <i class="fas fa-gift me-2"></i>Benefits
+                                        </div>
+                                        <div class="detail-value">
+                                            <p>{{ job.benefits }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="job-detail-section">
+                                        <div class="detail-label">
+                                            <i class="fas fa-envelope me-2"></i>Contact Information
+                                        </div>
+                                        <div class="detail-value">
+                                            <p>{{ job.contact_email|default('Contact information not provided') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <a href="/apply/{{ job._id }}" class="btn btn-success">
+                                        <i class="fas fa-paper-plane me-1"></i>Applied Candidates
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert alert-info">
-                No job postings available. Be the first to <a href="/create_job">post a job</a>!
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>No Jobs Found</h3>
+                <p class="text-muted mb-4">We couldn't find any job listings matching your criteria. Try adjusting your search filters or check back later for new opportunities.</p>
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>Return to Dashboard
+                </a>
             </div>
         {% endif %}
     </div>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle bookmark icon
+        document.querySelectorAll('.bookmark-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.replace('far', 'fas');
+                } else {
+                    icon.classList.replace('fas', 'far');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

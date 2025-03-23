@@ -1,12 +1,13 @@
 # app.py
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash,send_from_directory, abort
+
+from werkzeug.utils import secure_filename, safe_join
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_pymongo import PyMongo
 import os
 import json
 import uuid
-import datetime
+
 import requests
 import google.generativeai as genai
 import cv2
@@ -19,10 +20,11 @@ from moviepy import VideoFileClip
 import speech_recognition as sr
 from datetime import datetime
 from bson.objectid import ObjectId
-
-
-
-
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
+from datetime import datetime
+current_time = datetime.now()  # correct
 # Load environment variables
 load_dotenv()
 
@@ -73,7 +75,9 @@ def index():
     return render_template('index.html')
 
 
-
+@app.route('/test')
+def test():
+    return render_template('test.html')
 # Behavoural Qu
 
 @app.route('/behavoural')
@@ -207,7 +211,102 @@ def toggle_job_status(job_id):
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('/recruiter/dashboard.html')
+    # Check if user is logged in
+    if 'user_id' not in session:
+        flash('Please log in to access the dashboard')
+        return redirect(url_for('index'))
+        
+    # Get user information from session
+    user_type = session.get('user_type')
+    user_name = session.get('user_name')
+    
+    # If user is not a recruiter, redirect to appropriate dashboard
+    if user_type != 'recruiter':
+        flash('Access denied. This dashboard is for recruiters only.')
+        return redirect(url_for('index'))
+    
+    # Get active jobs count
+    active_jobs_count = jobs_collection.count_documents({'is_active': True})
+    
+    # Get total applications
+    total_applications = applications_collection.count_documents({})
+    
+    # Get recent applications with job titles
+    recent_applications_cursor = applications_collection.find().sort('date_applied', -1).limit(5)
+    recent_applications = []
+    
+    for app in recent_applications_cursor:
+        # Convert ObjectId to string
+        app['_id'] = str(app['_id'])
+        
+        # Get job title for this application
+        try:
+            job = jobs_collection.find_one({'_id': ObjectId(app['job_id'])})
+            if job:
+                app['job_title'] = job['title']
+            else:
+                app['job_title'] = "Unknown Job"
+        except:
+            app['job_title'] = "Unknown Job"
+        
+        recent_applications.append(app)
+    
+    # Get recent jobs with application counts
+    recent_jobs_cursor = jobs_collection.find().sort('date_posted', -1).limit(5)
+    recent_jobs = []
+    
+    for job in recent_jobs_cursor:
+        # Convert ObjectId to string
+        job['_id'] = str(job['_id'])
+        
+        # Count applications for this job
+        job['application_count'] = applications_collection.count_documents({'job_id': job['_id']})
+        
+        recent_jobs.append(job)
+    
+    # Calculate pipeline stages (if status field exists in applications)
+    try:
+        pipeline_new = applications_collection.count_documents({'status': 'new'})
+        pipeline_screening = applications_collection.count_documents({'status': 'screening'})
+        pipeline_interview = applications_collection.count_documents({'status': 'interview'})
+        pipeline_offer = applications_collection.count_documents({'status': 'offer'})
+        pipeline_hired = applications_collection.count_documents({'status': 'hired'})
+    except:
+        # Fallback if status field doesn't exist
+        pipeline_new = applications_collection.count_documents({})
+        pipeline_screening = pipeline_interview = pipeline_offer = pipeline_hired = 0
+    
+    # Calculate growth percentages (this would typically use comparison to previous period)
+    # For demonstration, using static values - in production you'd compare with last week's data
+    active_jobs_growth = 12
+    applications_growth = 8
+    interviews_growth = 15
+    offers_growth = -5
+    
+    # Mock interviews and offers counts
+    interviews_count = 56
+    offers_count = 12
+    
+    return render_template(
+        '/recruiter/dashboard.html',
+        user_name=user_name,
+        user_type=user_type,
+        active_jobs_count=active_jobs_count,
+        active_jobs_growth=active_jobs_growth,
+        total_applications=total_applications,
+        applications_growth=applications_growth,
+        interviews_count=interviews_count,
+        interviews_growth=interviews_growth,
+        offers_count=offers_count,
+        offers_growth=offers_growth,
+        recent_applications=recent_applications,
+        recent_jobs=recent_jobs,
+        pipeline_new=pipeline_new,
+        pipeline_screening=pipeline_screening,
+        pipeline_interview=pipeline_interview,
+        pipeline_offer=pipeline_offer,
+        pipeline_hired=pipeline_hired
+    )
 
 ############################
 # Login and Registration Routes for Job Seekers and Recruiters
@@ -243,7 +342,7 @@ def jobseeker_register():
             'experience': experience,
             'skills': skills,
             'password': generate_password_hash(password),
-            'created_at': datetime.datetime.now()
+            'created_at': datetime.now()
         }
         
         # Handle resume upload if included
@@ -370,17 +469,210 @@ def view_jobs_candidate():
     
     return render_template('view_jobs_candidate.html', jobs=jobs_list)
 
-# Applying for a specific job
+
+
+
+
+
+
+
+# Email configuration
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+EMAIL_ADDRESS = "shambharkarv84@gmail.com"
+EMAIL_PASSWORD = "lzzj yldn nuxk ofdr"  # Should be in environment variables
+
+def send_email(recipient_email, subject, body, is_html=False):
+    """
+    Send an email to the recipient
+    
+    Args:
+        recipient_email (str): Email address of the recipient
+        subject (str): Subject of the email
+        body (str): Content of the email
+        is_html (bool): Whether the body is HTML content
+    
+    Returns:
+        bool: True if email was sent successfully, False otherwise
+    """
+    msg = MIMEMultipart()
+    msg["From"] = EMAIL_ADDRESS
+    msg["To"] = recipient_email
+    msg["Subject"] = subject
+
+    # Attach the body with the appropriate content type
+    content_type = "html" if is_html else "plain"
+    msg.attach(MIMEText(body, content_type))
+
+    try:
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()  # Secure connection
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_ADDRESS, recipient_email, msg.as_string())
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error sending email to {recipient_email}: {e}")
+        return False
+
+def send_application_confirmation_email(applicant_name, applicant_email, job):
+    """
+    Send confirmation email to applicant
+    
+    Args:
+        applicant_name (str): Name of the applicant
+        applicant_email (str): Email of the applicant
+        job (dict): Job details dictionary
+    
+    Returns:
+        bool: True if email was sent successfully, False otherwise
+    """
+    subject = f"Application Received: {job['title']} at {job['company']}"
+    
+    # Generate HTML email content
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Application Confirmation</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }}
+            .header {{ background-color: #4a86e8; color: white; padding: 15px; text-align: center; border-radius: 5px 5px 0 0; margin: -20px -20px 20px; }}
+            .application-details {{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+            .footer {{ text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>Application Received</h2>
+            </div>
+            
+            <p>Dear {applicant_name},</p>
+            
+            <p>Thank you for applying for the <strong>{job['title']}</strong> position at <strong>{job['company']}</strong>.</p>
+            
+            <p>We have received your application and will review it shortly. If your qualifications match our requirements, our hiring team will contact you for the next steps.</p>
+            
+            <div class="application-details">
+                <h3>Application Details:</h3>
+                <p><strong>Position:</strong> {job['title']}</p>
+                <p><strong>Company:</strong> {job['company']}</p>
+                <p><strong>Date Applied:</strong> {datetime.now().strftime('%Y-%m-%d')}</p>
+            </div>
+            
+            <p>If you have any questions, please contact us at <a href="mailto:{job['contact_email']}">{job['contact_email']}</a>.</p>
+            
+            <p>Best regards,<br>
+            The Recruitment Team<br>
+            {job['company']}</p>
+            
+            <div class="footer">
+                <p>This is an automated message. Please do not reply to this email.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return send_email(applicant_email, subject, html_content, is_html=True)
+
+def notify_employer_about_application(job, application):
+    """
+    Send notification email to employer about new application
+    
+    Args:
+        job (dict): Job details dictionary
+        application (dict): Application details dictionary
+    
+    Returns:
+        bool: True if email was sent successfully, False otherwise
+    """
+    employer_email = job['contact_email']
+    
+    subject = f"New Application: {job['title']}"
+    
+    # Format the date applied
+    date_applied = application['date_applied'].strftime('%Y-%m-%d') if isinstance(application['date_applied'], datetime) else str(application['date_applied'])
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>New Job Application</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }}
+            .header {{ background-color: #4a86e8; color: white; padding: 15px; text-align: center; border-radius: 5px 5px 0 0; margin: -20px -20px 20px; }}
+            .applicant-details {{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+            .footer {{ text-align: center; margin-top: 30px; font-size: 0.8em; color: #777; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h2>New Job Application Received</h2>
+            </div>
+            
+            <p>A new application has been received for the <strong>{job['title']}</strong> position.</p>
+            
+            <div class="applicant-details">
+                <h3>Applicant Details:</h3>
+                <p><strong>Name:</strong> {application['name']}</p>
+                <p><strong>Email:</strong> <a href="mailto:{application['email']}">{application['email']}</a></p>
+                <p><strong>Phone:</strong> {application['phone']}</p>
+                <p><strong>Experience:</strong> {application['experience']} years</p>
+                <p><strong>Date Applied:</strong> {date_applied}</p>
+            </div>
+            
+        <p>To proceed with a Behavioral Interview for this candidate, click the button below:</p>
+        <a href="http://127.0.0.1:5000/test" class="cta-button">Start Behavioral Interview</a>
+        
+            
+            <p>Best regards,<br>
+            IntervoAI Team</p>
+            
+            <div class="footer">
+                <p>This is an automated message from your IntervoAI system.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    return send_email(employer_email, subject, html_content, is_html=True)
+
 @app.route('/apply_job_candidate/<job_id>', methods=['GET', 'POST'])
 def apply_job_candidate(job_id):
+    """
+    Handle job application submission and send confirmation emails
+    
+    Args:
+        job_id (str): ID of the job being applied for
+    
+    Returns:
+        HTML template or redirect
+    """
+    # Find the job details from database
     job = jobs_collection.find_one({'_id': ObjectId(job_id)})
+    
+    if not job:
+        flash('Job not found', 'danger')
+        return redirect(url_for('view_jobs_candidate'))
     
     if request.method == 'POST':
         # Get form data
+        applicant_name = request.form.get('name')
+        applicant_email = request.form.get('email')
+        
         application = {
             'job_id': job_id,
-            'name': request.form.get('name'),
-            'email': request.form.get('email'),
+            'name': applicant_name,
+            'email': applicant_email,
             'phone': request.form.get('phone'),
             'experience': request.form.get('experience'),
             'cover_letter': request.form.get('cover_letter'),
@@ -402,13 +694,42 @@ def apply_job_candidate(job_id):
                 application['resume_path'] = unique_filename
         
         try:
-            applications_collection.insert_one(application)
-            flash('Application submitted successfully!', 'success')
+            # Insert application into database
+            result = applications_collection.insert_one(application)
+            application['_id'] = result.inserted_id
+            
+            # Send confirmation email to candidate
+            email_sent = send_application_confirmation_email(applicant_name, applicant_email, job)
+            
+            # Notify employer about new application
+            employer_notified = notify_employer_about_application(job, application)
+            
+            # Flash appropriate messages
+            if email_sent:
+                flash('Application submitted successfully! A confirmation email has been sent to your email address.', 'success')
+            else:
+                flash('Application submitted, but we could not send a confirmation email. Please check your email address.', 'warning')
+                
+            if not employer_notified:
+                print(f"Failed to notify employer about application from {applicant_name}")
+                
             return redirect(url_for('view_jobs_candidate'))
         except Exception as e:
             flash(f'Error submitting application: {str(e)}', 'danger')
     
     return render_template('apply_job_candidate.html', job=job)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Viewing applications for a specific job
 @app.route('/view_applications_candidate/<job_id>', methods=['GET'])
@@ -420,9 +741,11 @@ def view_applications_candidate(job_id):
     
     return render_template('view_applications_candidate.html', job=job, applications=applications)
 
-# Downloading resume files
 @app.route('/download_resume_candidate/<filename>', methods=['GET'])
 def download_resume_candidate(filename):
+    safe_path = safe_join(app.config['UPLOAD_FOLDER'], filename)
+    if not os.path.exists(safe_path):
+        return abort(404)  # Return a 404 if file doesn't exist
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
 
 
