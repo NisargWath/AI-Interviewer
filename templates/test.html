@@ -33,19 +33,9 @@
             padding: 20px;
         }
         
-        header {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px 0;
-            margin-bottom: 30px;
-        }
+      
         
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
+  
         .logo {
             font-size: 24px;
             font-weight: bold;
@@ -203,18 +193,19 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">CareerMatch</div>
-                <nav>
-                    <a href="#" style="text-decoration: none; color: var(--dark-color); margin-left: 15px;">Home</a>
-                    <a href="#" style="text-decoration: none; color: var(--dark-color); margin-left: 15px;">Jobs</a>
-                    <a href="#" style="text-decoration: none; color: var(--dark-color); margin-left: 15px;">Profile</a>
-                </nav>
-            </div>
+    
+    <nav class="navbar py-1 px-5" style="background-color: #e6f0ff;">
+        <div class="container-fluid d-flex align-items-center">
+       
+            <a href="/" class="logo" style="text-decoration: none; font-size: 24px; font-weight: bold; color: #000;">
+                <span class="logo-icon" style="font-size: 28px;">⏳</span>
+                <span style="padding: 5px 10px; border-radius: 5px;">IntervoAI</span>
+            </a>
+            <a href="javascript:history.back()" class="btn btn-success btn-sm me-3" style="font-size: 18px; font-weight: bold; color: #fff;">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
         </div>
-    </header>
+    </nav>
     
     <main class="container">
         <div class="main-content">

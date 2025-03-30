@@ -49,6 +49,9 @@ job_recruiters = mongo.db.recruiters
 db = mongo.db.job_board
 jobs_collection = mongo.db.job_postings
 applications_collection = mongo.db.applications
+saved_jobs_collection = mongo.db.saved_jobs
+interviews_collection = mongo.db.interviews
+activities_collection = mongo.db.activities
 
 jobs_collection = mongo.db.job_postings
 # Initialize Gemini API
@@ -612,13 +615,16 @@ def send_application_confirmation_email(applicant_name, applicant_email, job):
             </div>
             
             <p>If you have any questions, please contact us at <a href="mailto:{job['contact_email']}">{job['contact_email']}</a>.</p>
-            
+            <a href="http://127.0.0.1:5000/behavoural" class="btn btn-primary" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+    Go to Behavioral Test
+</a>
             <p>Best regards,<br>
             The Recruitment Team<br>
             {job['company']}</p>
             
             <div class="footer">
                 <p>This is an automated message. Please do not reply to this email.</p>
+                
             </div>
         </div>
     </body>
@@ -932,13 +938,109 @@ def user_dashboard():
     # Check if user is logged in
     if 'user_id' not in session:
         flash('Please log in to access the dashboard')
-        return redirect(url_for('index'))
-    
+        return redirect(url_for('login'))
+       
     # Get user information from session
-    user_type = session.get('user_type')
+    user_id = session.get('user_id')
     user_name = session.get('user_name')
-    
-    return render_template('jobseekerDash.html', user_name=user_name, user_type=user_type)
+   
+    # Get user from database - changed from users_collection to job_seekers
+    user = job_seekers.find_one({'_id': ObjectId(user_id)})
+    if not user:
+        # Fallback if user not found
+        user = {'name': user_name, 'fullName': user_name}  
+   
+    # Get total applications
+    total_applications = applications_collection.count_documents({'user_id': user_id})
+   
+    # Get total saved jobs
+    total_saved_jobs = saved_jobs_collection.count_documents({'user_id': user_id})
+   
+    # Get total interviews
+    total_interviews = interviews_collection.count_documents({'user_id': user_id})
+   
+    # Get total offers
+    total_offers = applications_collection.count_documents({
+        'user_id': user_id,
+        'status': 'offer'
+    })
+   
+    # Get recent activities
+    recent_activities = list(activities_collection.find({
+        'user_id': user_id
+    }).sort('timestamp', -1).limit(5))
+   
+    # Format activities for display
+    activities = []
+    for activity in recent_activities:
+        # Format timestamp
+        timestamp = activity.get('timestamp')
+        if timestamp:
+            now = datetime.now()
+            delta = now - timestamp
+           
+            if delta.days == 0:
+                if delta.seconds < 3600:
+                    activity['timestamp'] = f'{delta.seconds // 60} minutes ago'
+                else:
+                    activity['timestamp'] = f'{delta.seconds // 3600} hours ago'
+            elif delta.days == 1:
+                activity['timestamp'] = 'Yesterday'
+            else:
+                activity['timestamp'] = timestamp.strftime('%b %d, %Y')
+       
+        # Assign icon based on activity type
+        activity_type = activity.get('type', '')
+        if activity_type == 'application':
+            activity['icon'] = 'fa-paper-plane'
+        elif activity_type == 'save':
+            activity['icon'] = 'fa-star'
+        elif activity_type == 'interview':
+            activity['icon'] = 'fa-calendar-check'
+        elif activity_type == 'offer':
+            activity['icon'] = 'fa-trophy'
+        else:
+            activity['icon'] = 'fa-check-circle'
+           
+        activities.append(activity)
+   
+    # Get recommended jobs
+    recommended_jobs = list(jobs_collection.find({
+        'is_active': True
+    }).sort('date_posted', -1).limit(4))
+   
+    # Format job data
+    for job in recommended_jobs:
+        # Calculate days since posting
+        days_ago = (datetime.now() - job.get('date_posted', datetime.now())).days
+        job['posted_days_ago'] = max(days_ago, 1)
+        job['_id'] = str(job['_id'])
+   
+    # Prepare stats dictionary with mock data for percentage changes
+    stats = {
+        'applications_sent': total_applications,
+        'applications_change': 5,
+        'saved_jobs': total_saved_jobs,
+        'saved_jobs_change': 10,
+        'interviews': total_interviews,
+        'interviews_change': 15,
+        'offers_received': total_offers,
+        'offers_change': 20
+    }
+   
+    # Mock notification and message counts
+    notification_count = 3
+    message_count = 2
+   
+    return render_template(
+        'jobseekerDash.html',
+        user=user,
+        stats=stats,
+        activities=activities,
+        recommended_jobs=recommended_jobs,
+        notification_count=notification_count,
+        message_count=message_count
+    )
 
 @app.route('/start-interview', methods=['POST'])
 def start_interview():
@@ -1516,4 +1618,4 @@ def download_report():
     return jsonify(report_data)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=7000)
